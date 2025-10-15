@@ -30,7 +30,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/rents" element={<Rents />} />
-          <Route path="/rent" element={<Rent />} />
+          <Route path="/rent:id" element={<Rent />} />
           <Route path="/carrello" element={<Carrello />} />
           <Route path="/userarea" element={
             <PrivateRoute isAuth={true}>
