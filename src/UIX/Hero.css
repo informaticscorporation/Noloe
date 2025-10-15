@@ -281,6 +281,8 @@ margin-top: 50px;
 
 .car-card img {
   height: 100%;
+  width: 100%;
+  object-fit: contain;
   border-radius: 10px;
 }
 
