@@ -1,0 +1,109 @@
+/* NAVBAR BASE */
+
+.navbar {
+  position: fixed;
+  top:30px;
+  border-radius: 100px;
+  width: 90%;
+  height: 20%;
+  padding: 1rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  color: green;
+  z-index: 2000;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(15px);
+}
+
+
+
+/* LOGO CENTRALE */
+.logo-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.logo-container img {
+  height: 100px;
+  cursor: pointer;
+}
+
+/* HAMBURGER MENU SINISTRA */
+.hamburger {
+  width: 35px;
+  height: 25px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  z-index: 2100; /* sopra il menu */
+}
+
+.line {
+  height: 3px;
+  width: 100%;
+  background: green;
+  border-radius: 3px;
+  transition: all 0.4s ease;
+}
+
+.hamburger.open .top {
+  transform: translateX(8px);
+  background: orange;
+}
+
+.hamburger.open .bottom {
+  transform: translateX(-3px);
+}
+
+/* SIGN-IN / SIGN-UP BUTTON */
+.signin-btn {
+  background: none;
+  border: 2px solid green;
+  color: green;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.signin-btn:hover {
+  background: green;
+  color: white;
+}
+
+
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+
+  /* Logo più piccolo */
+  .logo-container img {
+    height: 45px;
+  }
+
+  /* Pulsante più compatto e leggibile su mobile */
+  .signin-btn {
+    padding: 0.35rem 0.9rem; /* leggermente più grande per touch */
+    font-size: 0.85rem; /* testo più piccolo */
+    border-width: 1.5px; /* border più sottile */
+  }
+
+  /* Navbar più piccola */
+  .navbar {
+    height: 60px;
+    padding: 0.5rem 1rem;
+  }
+
+  /* Per evitare che il pulsante sia troppo vicino al bordo */
+  .signin-btn {
+    min-width: 80px;
+    text-align: center;
+  }
+}
+
