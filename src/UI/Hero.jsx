@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Car, MapPin, CalendarDays, Heart, Smartphone, ShieldCheck, DollarSign, CreditCard } from "lucide-react";
 
@@ -9,7 +9,8 @@ export default function Hero({ menuOpen, setMenuOpen }) {
   const [loading, setLoading] = useState(true);
   const closeMenu = () => setMenuOpen(false);
   const navigate = useNavigate();
-  
+  sessionStorage.setItem("Loading", false);
+
   const brands = [
     { name: "BMW", src: "https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg" },
     { name: "Audi", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Audi-Logo_2016.svg/1199px-Audi-Logo_2016.svg.png" },
@@ -38,7 +39,11 @@ export default function Hero({ menuOpen, setMenuOpen }) {
   ];
 
   // --- Preloader globale ---
-  useEffect(() => {
+ useEffect(() => {
+  // Controlla se il loading è già stato fatto
+  const hasLoaded = sessionStorage.getItem("Loading") === "true";
+
+  if (!hasLoaded) {
     const images = [
       "https://pngimg.com/d/bmw_PNG99543.png",
       ...brands.map(b => b.src),
@@ -53,10 +58,57 @@ export default function Hero({ menuOpen, setMenuOpen }) {
       img.src = src;
       img.onload = img.onerror = () => {
         loaded++;
-        if (loaded === total) setLoading(false);
+        if (loaded === total) {
+          setLoading(false);
+          sessionStorage.setItem("Loading", "true"); // Salva che è già stato caricato
+        }
       };
     });
-  }, []);
+  } else {
+    // Se già caricato, salta il preloader
+    setLoading(false);
+  }
+}, []);
+
+  // --- COMPONENTE ANIMAZIONE ---
+  function AnimatedCard({ children, index = 0, from = "bottom", delay = 0.2 }) {
+    const ref = useRef();
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+      if (ref.current) observer.observe(ref.current);
+      return () => observer.disconnect();
+    }, []);
+
+    const transformMap = {
+      bottom: "translateY(30px)",
+      top: "translateY(-30px)",
+      left: "translateX(-30px)",
+      right: "translateX(30px)",
+    };
+
+    return (
+      <div
+        ref={ref}
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateX(0) translateY(0)" : transformMap[from],
+          transition: `opacity 0.6s ease ${index * delay}s, transform 0.6s ease ${index * delay}s`,
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -73,179 +125,177 @@ export default function Hero({ menuOpen, setMenuOpen }) {
       {/* MENU SLIDE */}
       <div className={`menu-popup ${menuOpen ? "show" : ""}`}>
         <ul>
-          <li onClick={() => {
-            closeMenu();
-            navigate("/");
-          } }>Home</li>
-          <li onClick={() => {
-            closeMenu();
-            navigate("/rents");
-          }}>Rents</li>
-          <li onClick={() => {
-            closeMenu();
-            navigate("/about");
-          }}>About</li>
-          <li onClick={() => {
-            closeMenu();
-            navigate("/contact");
-          }}>Contact</li>
+          <li onClick={() => { closeMenu(); navigate("/"); }}>Home</li>
+          <li onClick={() => { closeMenu(); navigate("/rents"); }}>Rents</li>
         </ul>
       </div>
 
       <div className="separatore"></div>
 
-      {/* --- HERO --- */}
+      {/* HERO */}
       <section className="hero-wrapper">
-        <h1 className="hero-title">
-          Discover the world on wheels <br />
-          with our <span className="highlight">luxury car rental</span>
-        </h1>
+        <AnimatedCard index={0} from="top">
+          <h1 className="hero-title">
+            Discover the world on wheels <br />
+            with our <span className="highlight">luxury car rental</span>
+          </h1>
+        </AnimatedCard>
 
-        <div className="hero-image">
-          <img src="https://pngimg.com/d/bmw_PNG99543.png" alt="Car" />
-        </div>
-
-        <div className="hero-search">
-          <div className="search-grid">
-            <div className="search-item">
-              <label><MapPin size={16} /> Pick-up Location</label>
-              <input type="text" placeholder="Search a location" />
-            </div>
-            <div className="search-item">
-              <label><CalendarDays size={16} /> Pick-up Date</label>
-              <input type="date" />
-            </div>
-            <div className="search-item">
-              <label><MapPin size={16} /> Drop-off Location</label>
-              <input type="text" placeholder="Search a location" />
-            </div>
-            <div className="search-item">
-              <label><CalendarDays size={16} /> Drop-off Date</label>
-              <input type="date" />
-            </div>
-            <button className="find-btn">Find a Vehicle</button>
+        <AnimatedCard index={1} from="bottom">
+          <div className="hero-image">
+            <img src="https://pngimg.com/d/bmw_PNG99543.png" alt="Car" />
           </div>
-        </div>
+        </AnimatedCard>
+
+        <AnimatedCard index={2} from="bottom">
+          <div className="hero-search">
+            <div className="search-grid">
+              <div className="search-item">
+                <label><MapPin size={16} /> Pick-up Location</label>
+                <input type="text" placeholder="Search a location" />
+              </div>
+              <div className="search-item">
+                <label><CalendarDays size={16} /> Pick-up Date</label>
+                <input type="date" />
+              </div>
+              <div className="search-item">
+                <label><MapPin size={16} /> Drop-off Location</label>
+                <input type="text" placeholder="Search a location" />
+              </div>
+              <div className="search-item">
+                <label><CalendarDays size={16} /> Drop-off Date</label>
+                <input type="date" />
+              </div>
+              <button className="find-btn">Find a Vehicle</button>
+            </div>
+          </div>
+        </AnimatedCard>
       </section>
 
-      {/* --- BRANDS --- */}
+      {/* BRANDS */}
       <section className="brands-section">
-        <h2>Rent by Brands</h2>
+        <AnimatedCard index={0} from="left">
+          <h2>Rent by Brands</h2>
+        </AnimatedCard>
         <div className="brands-grid">
-          {brands.map(b => (
-            <div key={b.name} className="brand-card">
-              <img src={b.src} alt={b.name} width={35} />
-              <p>{b.name}</p>
-            </div>
+          {brands.map((b, idx) => (
+            <AnimatedCard key={b.name} index={idx + 1} from="bottom">
+              <div className="brand-card">
+                <img src={b.src} alt={b.name} width={35} />
+                <p>{b.name}</p>
+              </div>
+            </AnimatedCard>
           ))}
         </div>
       </section>
 
-      {/* --- BODY TYPES --- */}
+      {/* BODY TYPES */}
       <section className="bodytype-section">
-        <h2>Rent by Body Type</h2>
+        <AnimatedCard index={0} from="left">
+          <h2>Rent by Body Type</h2>
+        </AnimatedCard>
         <div className="bodytype-grid">
-          {bodyTypes.map(t => (
-            <div key={t.name} className="bodytype-card">
-              {t.icon}
-              <p>{t.name}</p>
-            </div>
+          {bodyTypes.map((t, idx) => (
+            <AnimatedCard key={t.name} index={idx + 1} from="bottom">
+              <div className="bodytype-card">
+                {t.icon}
+                <p>{t.name}</p>
+              </div>
+            </AnimatedCard>
           ))}
         </div>
       </section>
 
-      {/* --- CAR COLLECTION --- */}
+      {/* CAR COLLECTION */}
       <section className="collection-section">
-        <h2 className="collection-title">Our Impressive Collection of Cars</h2>
-        <p className="collection-subtitle">
-          Ranging from elegant sedans to powerful sports cars, all carefully selected to provide our
-          customers with the ultimate driving experience.
-        </p>
+        <AnimatedCard index={0} from="left">
+          <h2 className="collection-title">Our Impressive Collection of Cars</h2>
+          <p className="collection-subtitle">
+            Ranging from elegant sedans to powerful sports cars, all carefully selected to provide our
+            customers with the ultimate driving experience.
+          </p>
+        </AnimatedCard>
 
         <div className="collection-filters">
-          {["Popular Car", "Luxury Car", "Vintage Car", "Family Car", "Off-Road Car"].map(filter => (
-            <button key={filter} className="filter-btn">{filter}</button>
+          {["Popular Car", "Luxury Car", "Vintage Car", "Family Car", "Off-Road Car"].map((filter, idx) => (
+            <AnimatedCard key={filter} index={idx + 1} from="bottom">
+              <button className="filter-btn">{filter}</button>
+            </AnimatedCard>
           ))}
         </div>
 
         <div className="car-grid">
-          {carCollection.map(car => (
-            <div key={car.name} className="car-card">
-              <img src={car.img} alt={car.name} />
-              <h3>{car.name}</h3>
-              <p className="price">{car.price}</p>
-
-              <div className="specs">
-                <span>🚗 Auto</span>
-                <span>👨‍👩‍👦 4 Person</span>
-                <span>⚡ Electric</span>
+          {carCollection.map((car, idx) => (
+            <AnimatedCard key={car.name} index={idx + 1} from="bottom">
+              <div className="car-card">
+                <img src={car.img} alt={car.name} />
+                <h3>{car.name}</h3>
+                <p className="price">{car.price}</p>
+                <div className="specs">
+                  <span>🚗 Auto</span>
+                  <span>👨‍👩‍👦 4 Person</span>
+                  <span>⚡ Electric</span>
+                </div>
+                <button className="rent-btn">Rent Now</button>
               </div>
-
-              <button className="rent-btn">Rent Now</button>
-            </div>
+            </AnimatedCard>
           ))}
         </div>
 
         <div className="see-all-container">
-          <button className="see-all-btn">See all Cars</button>
+          <AnimatedCard index={0} from="bottom">
+            <button className="see-all-btn">See all Cars</button>
+          </AnimatedCard>
         </div>
       </section>
 
-      {/* --- HOW IT WORKS --- */}
+      {/* HOW IT WORKS */}
       <section className="how-section">
-        <h2>How it Works</h2>
+        <AnimatedCard index={0} from="left">
+          <h2>How it Works</h2>
+        </AnimatedCard>
         <div className="how-grid">
-          <div className="how-card">
-            <MapPin size={32} />
-            <h3>Choose Location</h3>
-            <p>Select where you want to pick up and drop off your car.</p>
-          </div>
-          <div className="how-card">
-            <CalendarDays size={32} />
-            <h3>Select Dates</h3>
-            <p>Pick your rental start and end dates in seconds.</p>
-          </div>
-          <div className="how-card">
-            <Car size={32} />
-            <h3>Enjoy the Drive</h3>
-            <p>Drive in comfort and style with premium vehicles.</p>
-          </div>
-          <div className="how-card">
-            <CreditCard size={32} />
-            <h3>Pay with Ease</h3>
-            <p>Pay for your rental with ease and convenience.</p>
-          </div>
+          {[
+            { icon: <MapPin size={32} />, title: "Choose Location", desc: "Select where you want to pick up and drop off your car." },
+            { icon: <CalendarDays size={32} />, title: "Select Dates", desc: "Pick your rental start and end dates in seconds." },
+            { icon: <Car size={32} />, title: "Enjoy the Drive", desc: "Drive in comfort and style with premium vehicles." },
+            { icon: <CreditCard size={32} />, title: "Pay with Ease", desc: "Pay for your rental with ease and convenience." },
+          ].map((item, idx) => (
+            <AnimatedCard key={item.title} index={idx + 1} from="bottom">
+              <div className="how-card">
+                {item.icon}
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+              </div>
+            </AnimatedCard>
+          ))}
         </div>
       </section>
 
-      {/* --- SERVICES --- */}
+      {/* SERVICES */}
       <section className="services-section">
-        <h2>Why Choose Us</h2>
+        <AnimatedCard index={0} from="left">
+          <h2>Why Choose Us</h2>
+        </AnimatedCard>
         <div className="service-grid">
-          <div className="service-card">
-            <ShieldCheck size={32} />
-            <h3>Trusted Service</h3>
-            <p>Professional assistance and 24/7 support.</p>
-          </div>
-          <div className="service-card">
-            <DollarSign size={32} />
-            <h3>Transparent Pricing</h3>
-            <p>No hidden costs, pay only what you see.</p>
-          </div>
-          <div className="service-card">
-            <Smartphone size={32} />
-            <h3>Book Anywhere</h3>
-            <p>Our app makes booking fast and convenient.</p>
-          </div>
-          <div className="service-card">
-            <Heart size={32} />
-            <h3>Customer Satisfaction</h3>
-            <p>100% customer satisfaction guarantee.</p>
-          </div>
+          {[
+            { icon: <ShieldCheck size={32} />, title: "Trusted Service", desc: "Professional assistance and 24/7 support." },
+            { icon: <DollarSign size={32} />, title: "Transparent Pricing", desc: "No hidden costs, pay only what you see." },
+            { icon: <Smartphone size={32} />, title: "Book Anywhere", desc: "Our app makes booking fast and convenient." },
+            { icon: <Heart size={32} />, title: "Customer Satisfaction", desc: "100% customer satisfaction guarantee." },
+          ].map((item, idx) => (
+            <AnimatedCard key={item.title} index={idx + 1} from="bottom">
+              <div className="service-card">
+                {item.icon}
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+              </div>
+            </AnimatedCard>
+          ))}
         </div>
       </section>
 
-      {/* --- FOOTER --- */}
+      {/* FOOTER */}
       <footer className="footer">
         <p className="footer-text">© 2025 Luxedrive. All rights reserved.</p>
         <div className="footer-links">

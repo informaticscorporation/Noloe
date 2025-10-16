@@ -7,8 +7,6 @@ import "./App.css";
 import PrivateRoute from "./Component/PrivateRoute";
 //Pagine 
 import Home from "./Page/Home";
-import About from "./Page/About";
-import Contact from "./Page/Contact";
 import Register from "./Page/Register";
 import Login from "./Page/Login";
 import Rents from "./Page/Rents";
@@ -25,13 +23,14 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
+          
+         
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/rents" element={<Rents />} />
           <Route path="/rent:id" element={<Rent />} />
           <Route path="/carrello" element={<Carrello />} />
+          <Route path="*" element={<h1>404</h1>} />
           <Route path="/userarea" element={
             <PrivateRoute isAuth={true}>
               <UserArea />

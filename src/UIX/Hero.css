@@ -16,10 +16,12 @@
   text-align: center;
   margin-bottom: 20px;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  
 }
   .highlight {
   color: orange;
   text-shadow: 0 0 10px rgb(255, 166, 0);
+ 
 }
 
 /* MENU SLIDE DA SINISTRA */
@@ -90,6 +92,7 @@
   max-width: 90%;
   filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.25));
   margin: 40px 0;
+  
 }
 
 .hero-search {
@@ -240,9 +243,10 @@ margin-top: 50px;
 }
 
 .collection-filters {
+  height: max-content;
     width: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 12px;
   margin-bottom: 40px;
   padding: 30px;
@@ -270,6 +274,7 @@ margin-top: 50px;
 }
 
 .car-card {
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -429,6 +434,12 @@ margin-top: 50px;
   margin: 10px 0;
   font-size: 0.8rem;
 }
+.footer-text font {
+  color: white;
+}
+.footer-links a font {
+  color: white;
+}
 
 .loading-container {
   display: flex;
@@ -453,14 +464,32 @@ margin-top: 50px;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
-
+/*Animation*/
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
+@keyframes Fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 
+  
+}
 
+@keyframes TraslateX {
+  from {
+    transform: translateX(-130%);
+  }
+  to {
+    transform: translateX(0);
+  }
+  
+}
 
 @media (max-width: 768px) {
   .menu-popup li {
@@ -537,7 +566,8 @@ margin-top: 50px;
   }
 
   .collection-filters {
-    
+    justify-content: flex-start;
+    overflow-y: hidden;
     overflow-x: auto;
     white-space: nowrap;
     gap: 6px;

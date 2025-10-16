@@ -1,10 +1,12 @@
 import { useState, useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 import "../UIX/Navbar.css";
 
 export default function Navbar({setMenuOpen, menuOpen}) {
   
   const [mobile, setMobile] = useState(false);
    const [widthWindow, setWidthWindow] = useState(window.innerWidth);
+   const navigate = useNavigate();
   useEffect(() => {
     const checkScreenSize = () => {
       setWidthWindow(window.innerWidth);
@@ -42,7 +44,7 @@ export default function Navbar({setMenuOpen, menuOpen}) {
 
       {/* SIGN IN / SIGN UP */}
       <div className="signin-container">
-        <button className="signin-btn">{mobile === true ? "Sign In" : "Sign In / Sign Up" }</button>
+        <button className="signin-btn" onClick={() => navigate("/login")}>{mobile === true ? "Sign In" : "Sign In / Sign Up" }</button>
       </div>
 
      

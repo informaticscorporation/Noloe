@@ -1,13 +1,89 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Noloè Autonoleggio</title>
+
+    <style>
+      /* 🌍 Stile principale */
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        top: 0 !important;
+      }
+
+      /* Nasconde widget originale di Google */
+      .goog-te-banner-frame.skiptranslate,
+      .goog-te-gadget-icon,
+      .goog-te-balloon-frame,
+      #goog-gt-tt {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+
+      /* Mantieni questa classe come richiesto */
+      .VIpgJd-ZVi9od-ORHb-OEVmcd {
+        display: none !important;
+      }
+      .VIpgJd-ZVi9od-aZ2wEe {
+        display: none !important;
+      }
+
+      .VIpgJd-ZVi9od-aZ2wEe-wOHMyf VIpgJd-ZVi9od-aZ2wEe-wOHMyf-ti6hGc {
+        display: none !important;
+      }
+
+      .VIpgJd-ZVi9od-aZ2wEe-wOHMyf-ti6hGc {
+        display: none !important;
+      }
+
+      /* Responsive per eventuali elementi futuri */
+      @media (max-width: 480px) {
+        /* Puoi aggiungere stili mobile se necessario */
+      }
+    </style>
+
+    <!-- Google Translate -->
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        // Rileva lingua del dispositivo
+        const userLang = navigator.language || navigator.userLanguage;
+        const langCode = userLang.split('-')[0]; // es: "it" da "it-IT"
+
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            includedLanguages: "it,en,fr,de,es,pt",
+            autoDisplay: false
+          },
+          "google_translate_container"
+        );
+
+        // Applica lingua del dispositivo dopo un breve delay
+        setTimeout(() => {
+          const select = document.querySelector(".goog-te-combo");
+          if (select && langCode !== "en") { // se non è inglese
+            select.value = langCode;
+            select.dispatchEvent(new Event("change"));
+          }
+        }, 500);
+      }
+    </script>
+
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   </head>
+
   <body>
+    <!-- Contenitore principale React -->
     <div id="root"></div>
+
+    <!-- Contenitore invisibile richiesto da Google -->
+    <div id="google_translate_container" style="display: none"></div>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

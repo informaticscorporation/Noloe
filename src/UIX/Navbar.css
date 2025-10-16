@@ -21,12 +21,18 @@
 
 /* LOGO CENTRALE */
 .logo-container {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ 
+ 
+  
 }
 
 .logo-container img {
+  position: relative;
+  left: 40px;
   height: 100px;
   cursor: pointer;
 }
@@ -71,9 +77,16 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
+.signin-btn font {
+  color: green;
+}
 
 .signin-btn:hover {
   background: green;
+  color: white;
+}
+
+.signin-btn:hover font {
   color: white;
 }
 
