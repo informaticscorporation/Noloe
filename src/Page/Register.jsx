@@ -114,7 +114,7 @@ export default function Register() {
               <label htmlFor="terms">I accept the Terms & Conditions and Privacy Policy</label>
             </div>
 
-            <button className="sign-up" id="tre" translate="no">Login</button>
+            <button className="sign-up" id="tre" translate="no">Sign in</button>
           </div>
         </Animation>
       </div>
