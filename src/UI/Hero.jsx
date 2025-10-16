@@ -125,8 +125,8 @@ export default function Hero({ menuOpen, setMenuOpen }) {
       {/* MENU SLIDE */}
       <div className={`menu-popup ${menuOpen ? "show" : ""}`}>
         <ul>
-          <li onClick={() => { closeMenu(); navigate("/"); }}>Home</li>
-          <li onClick={() => { closeMenu(); navigate("/rents"); }}>Rents</li>
+          <li translate="no" onClick={() => { closeMenu(); navigate("/"); }}>Home</li>
+          <li translate="no" onClick={() => { closeMenu(); navigate("/rents"); }}>Rents</li>
         </ul>
       </div>
 
