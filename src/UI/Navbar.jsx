@@ -44,7 +44,7 @@ export default function Navbar({setMenuOpen, menuOpen}) {
 
       {/* SIGN IN / SIGN UP */}
       <div className="signin-container">
-        <button className="signin-btn" onClick={() => navigate("/login")}>{mobile === true ? "Sign In" : "Sign In / Sign Up" }</button>
+        <button className="signin-btn" onClick={() => navigate("/login")}>{mobile === true ? "Sign up" : "Sign In / Sign Up" }</button>
       </div>
 
      

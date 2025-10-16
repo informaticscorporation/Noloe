@@ -23,6 +23,9 @@
   text-shadow: 0 0 10px rgb(255, 166, 0);
  
 }
+.highlight font {
+  color: orange;
+}
 
 /* MENU SLIDE DA SINISTRA */
 .menu-popup {
