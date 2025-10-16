@@ -127,6 +127,7 @@
 
 /* Animazioni */
 .fade-up {
+    height: 100%;
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.6s ease;
