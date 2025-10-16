@@ -98,6 +98,7 @@
   /* Logo più piccolo */
   .logo-container img {
     height: 45px;
+    left: 10px;
   }
 
   /* Pulsante più compatto e leggibile su mobile */
