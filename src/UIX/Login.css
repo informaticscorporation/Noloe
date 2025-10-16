@@ -141,13 +141,14 @@
 @media (max-width: 768px) {
   .login-container {
     flex-direction: column;
+    justify-content: space-between;
   }
 
   .login-left,
   .login-right {
     flex: none;
     width: 100%;
-    height: 50vh;
+    height: 50%;
     text-align: center;
   }
 
