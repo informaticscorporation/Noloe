@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Mail, Lock, User, Smartphone, FileText,  } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "../UIX/Register.css";
 
 function Animation({ children }) {
@@ -25,6 +26,7 @@ function Animation({ children }) {
 }
 
 export default function Register() {
+  const navigate = useNavigate();
    
 
   return (
@@ -34,7 +36,7 @@ export default function Register() {
         <Animation>
           <h1 className="logo">Welcome!</h1>
           <p className="subtitle">Already have an account? Sign in to continue.</p>
-          <button className="sign-btn">Sign up</button>
+          <button className="sign-btn" onClick={() => navigate(-1)}>Sign up</button>
         </Animation>
       </div>
 
