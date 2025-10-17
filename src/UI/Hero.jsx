@@ -32,10 +32,12 @@ export default function Hero({ menuOpen, setMenuOpen }) {
   ];
 
   const carCollection = [
-    { name: "BMW X5", img: "https://pngimg.com/d/bmw_PNG99543.png", price: "$120/day" },
-    { name: "Audi A6", img: "https://www.pngarts.com/files/11/Audi-A6-PNG-High-Quality-Image.png", price: "$100/day" },
-    { name: "Tesla Model 3", img: "https://www.pngarts.com/files/11/Tesla-Model-S-PNG-Image-Background.png", price: "$150/day" },
-    { name: "Ford Mustang", img: "https://www.pngarts.com/files/3/Ford-Mustang-PNG-High-Quality-Image.png", price: "$140/day" },
+    { id: "bmw-x5", name: "BMW X5", img: "https://pngimg.com/d/bmw_PNG99543.png", price: "$120/day" },
+    { id: "audi-a6", name: "Audi A6", img: "https://www.pngarts.com/files/11/Audi-A6-PNG-High-Quality-Image.png", price: "$100/day" },
+    { id: "teslamodel3", name: "Tesla Model 3", img: "https://www.pngarts.com/files/11/Tesla-Model-S-PNG-Image-Background.png", price: "$150/day" },
+    { id: "ford-mustang", name: "Ford Mustang", img: "https://www.pngarts.com/files/3/Ford-Mustang-PNG-High-Quality-Image.png", price: "$140/day" },
+    {id: "bmw-x5", name: "BMW X5", img: "https://pngimg.com/d/bmw_PNG99543.png", price: "$120/day" },
+    { id: "audi-a6", name: "Audi A6", img: "https://www.pngarts.com/files/11/Audi-A6-PNG-High-Quality-Image.png", price: "$100/day" },
   ];
 
   // --- Preloader globale ---
@@ -228,7 +230,7 @@ export default function Hero({ menuOpen, setMenuOpen }) {
           {carCollection.map((car, idx) => (
             <AnimatedCard key={car.name} index={idx + 1} from="bottom">
               <div className="car-card">
-                <img src={car.img} alt={car.name} />
+                <img className="car-img" src={car.img} alt={car.name} />
                 <h3>{car.name}</h3>
                 <p className="price">{car.price}</p>
                 <div className="specs">
@@ -236,7 +238,7 @@ export default function Hero({ menuOpen, setMenuOpen }) {
                   <span>👨‍👩‍👦 4 Person</span>
                   <span>⚡ Electric</span>
                 </div>
-                <button className="rent-btn">Rent Now</button>
+                <button className="rent-btn" onClick={() => navigate(`/rents/${car.id}`)}>Rent Now</button>
               </div>
             </AnimatedCard>
           ))}
@@ -244,7 +246,7 @@ export default function Hero({ menuOpen, setMenuOpen }) {
 
         <div className="see-all-container">
           <AnimatedCard index={0} from="bottom">
-            <button className="see-all-btn">See all Cars</button>
+            <button className="see-all-btn" onClick={() => navigate("/rents")}>See all Cars</button>
           </AnimatedCard>
         </div>
       </section>

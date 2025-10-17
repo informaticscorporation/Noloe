@@ -157,7 +157,7 @@ export default function Rents() {
           <AnimatedCard key={i} index={i} from={i % 2 === 0 ? "left" : "right"}>
             <div className="car-card" onClick={() => navigate("/rents/teslamodel3")}
 >
-              <img src={car.img} alt={car.name} />
+              <img className="car-image" src={car.img} alt={car.name} />
               <div className="car-info">
                 <h3>{car.name}</h3>
                 <p className="price">{car.price}</p>

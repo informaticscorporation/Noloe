@@ -107,7 +107,7 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-.car-card img {
+.car-image {
   width: 100%;
   height: 140px;
   object-fit: contain;
