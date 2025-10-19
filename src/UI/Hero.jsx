@@ -218,9 +218,9 @@ export default function Hero({ menuOpen, setMenuOpen }) {
           </p>
         </AnimatedCard>
 
-        <div className="collection-filters">
-          {["Popular Car", "Luxury Car", "Vintage Car", "Family Car", "Off-Road Car"].map((filter, idx) => (
-            <AnimatedCard key={filter} index={idx + 1} from="bottom">
+        <div className="collection-filters" translate="no">
+          {["City Car", "Small Car", "Compact/Berline", "SUV/Crossover", "Vans", "9 seater", "Scooter 125cc", "Scooter 150cc"].map((filter, idx) => (
+            <AnimatedCard key={filter} index={idx + 1} from="bottom" translate>
               <button className="filter-btn">{filter}</button>
             </AnimatedCard>
           ))}

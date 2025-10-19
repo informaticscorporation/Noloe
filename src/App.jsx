@@ -43,7 +43,7 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <PrivateRoute isAuth={false} >
+              <PrivateRoute isAuth={true} >
                 <Dashboard />
               </PrivateRoute>
             }
