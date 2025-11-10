@@ -4,7 +4,7 @@ import { DateRange } from "react-date-range";
 import { addDays, differenceInDays } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import "../UIX/booking.css"; // metti qui il CSS che hai fornito
+import "../UIX/Booking.css"; // metti qui il CSS che hai fornito
 
 export default function Pronotation() {
   const { id } = useParams();
