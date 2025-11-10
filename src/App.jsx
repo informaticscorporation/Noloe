@@ -5,50 +5,41 @@ import { HelmetProvider } from "react-helmet-async";
 import "./App.css";
 //component
 import PrivateRoute from "./Component/PrivateRoute";
-//Pagine 
+//Pages
 import Home from "./Page/Home";
 import Register from "./Page/Register";
 import Login from "./Page/Login";
 import Rents from "./Page/Rents";
 import Rent from "./Page/Rent";
-import Carrello from "./Page/Carrello";
+import Pagamento from "./Page/Pagamento";
 import UserArea from "./Page/UserArea";
 import Dashboard from "./Page/Dashboard";
-
-
+import Pronotation from "./Page/Prenotation";
 
 function App() {
   return (
     <HelmetProvider>
       <Router>
         <Routes>
+
+          {/* Public routes */}
           <Route path="/" element={<Home />} />
-          
-         
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/rents" element={<Rents />} />
           <Route path="/rents/:id" element={<Rent />} />
-          <Route path="/carrello" element={
-            <PrivateRoute isAuth={true}>
-              <Carrello />
-            </PrivateRoute>
-          } />
+
+          {/* ✅ Private routes wrapper */}
+          <Route element={<PrivateRoute isAuth={true} />}>
+            <Route path="/prenotation/:id" element={<Pronotation />} />
+            <Route path="/pagamento" element={<Pagamento/>} />
+            <Route path="/userarea" element={<UserArea />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
+
+          {/* 404 */}
           <Route path="*" element={<h1>404</h1>} />
-          <Route path="/userarea" element={
-            <PrivateRoute isAuth={true}>
-              <UserArea />
-            </PrivateRoute>
-          } />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute isAuth={true} >
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-         
+
         </Routes>
       </Router>
     </HelmetProvider>

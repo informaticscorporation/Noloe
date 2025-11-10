@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Car,
@@ -8,9 +9,10 @@ import {
   Settings,
   ClipboardList,
 } from "lucide-react";
-import "../UIX/Dashboard.css";
+import "../UIX/Sidebar.css";
 
-export default function Sidebar({ menuOpen, setMenuOpen }) {
+export default function Sidebar({ menuOpen, setMenuOpen, mobileMenuOpen, setMobileMenuOpen }) {
+  const [mobile, setMobile] = useState(false);
   const buttons = [
     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
     { id: "cars", label: "Auto", icon: <Car size={20} /> },
@@ -21,19 +23,32 @@ export default function Sidebar({ menuOpen, setMenuOpen }) {
     { id: "reports", label: "Report", icon: <BarChart3 size={20} /> },
     { id: "settings", label: "Impostazioni", icon: <Settings size={20} /> },
   ];
+  useEffect(() => {
+    const width = window.innerWidth;
+    if (width <= 768) {
+      setMobile(true);
+    } else {
+      setMobile(false);
+    }
+  }, []);
 
   return (
-    <div className="sidebar-container">
+    <div className={`sidebar-container ${mobileMenuOpen ? "open " : ""}`}>
+
       <div className="sidebar-header">
         <img  className="logo" src="/logo.webp" alt=" Logo" />
       </div>
-
+          
       <div className="sidebar-menu">
+       
         {buttons.map((btn) => (
           <button
             key={btn.id}
             className={`sidebar-btn ${menuOpen === btn.id ? "active" : ""}`}
-            onClick={() => setMenuOpen(btn.id)}
+            onClick={() => {
+              setMenuOpen(btn.id);
+              if (mobile) setMobileMenuOpen(false);
+            }}
           >
             {btn.icon}
             <span>{btn.label}</span>

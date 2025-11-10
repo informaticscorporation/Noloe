@@ -228,7 +228,7 @@ export default function Hero({ menuOpen, setMenuOpen }) {
 
         <div className="car-grid">
           {carCollection.map((car, idx) => (
-            <AnimatedCard key={car.name} index={idx + 1} from="bottom">
+            <AnimatedCard key={idx+1} index={idx + 1} from="bottom">
               <div className="car-card">
                 <img className="car-img" src={car.img} alt={car.name} />
                 <h3>{car.name}</h3>

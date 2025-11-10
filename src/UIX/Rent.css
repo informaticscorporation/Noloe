@@ -124,7 +124,7 @@
 }
 
 .rent-btn {
-  background: linear-gradient(135deg, #007bff, #00b894);
+  background: green;
   color: white;
   padding: 14px 24px;
   border: none;
@@ -139,7 +139,7 @@
 
 .rent-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(0,123,255,0.3);
+  box-shadow: 0 8px 18px rgb(4, 106, 19);
 }
 
 .rent-btn.disabled {

@@ -1,174 +1,89 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Menu } from "lucide-react";
 import "../UIX/Dashboard.css";
 
-export default function HeroDashboard({ menuOpen }) {
-  // Stato condiviso per il calendario
+
+import Cars from "./Cars";
+import Clients from "./Clients";
+import Bookings from "./Bookings";
+import Payments from "./Payments";
+import Calendar from "./Calendar";
+import Reports from "./Reports";
+import Settings from "./Settings";
+
+export default function HeroDashboard({ menuOpen, setMobileMenuOpen }) {
+  const [mobile, setMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setMobile(window.innerWidth <= 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const openMenuButton = mobile ? (
+    <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
+      <Menu size={24} /> Apri Menu
+    </button>
+  ) : null;
+
+  /* ======== STATE CONDIVISI ======== */
+  const [cars, setCars] = useState([
+    { id: 1, modello: "Fiat Panda", targa: "AB123CD", stato: "Disponibile" },
+    { id: 2, modello: "Volkswagen Golf", targa: "EF456GH", stato: "Manutenzione" },
+    { id: 3, modello: "Jeep Renegade", targa: "IJ789KL", stato: "Occupata" },
+  ]);
+
+  const [clients, setClients] = useState([
+    { id: 1, nome: "Mario Rossi", telefono: "3331234567", email: "mario@esempio.com" },
+    { id: 2, nome: "Giulia Bianchi", telefono: "3409876543", email: "giulia@esempio.com" },
+  ]);
+
+  const [bookings, setBookings] = useState([
+    { id: 1, cliente: "Mario Rossi", auto: "Fiat Panda", data: "2025-11-01", stato: "Confermato" },
+  ]);
+
+  const [payments, setPayments] = useState([
+    { id: 1, cliente: "Mario Rossi", importo: 120, metodo: "Carta di credito", stato: "Completato" },
+  ]);
+
+  const reports = [
+    { id: 1, titolo: "Report Mensile", descrizione: "Statistiche del mese di Ottobre 2025", data: "2025-10-31" },
+    { id: 2, titolo: "Analisi Utilizzo Auto", descrizione: "Analisi tasso di utilizzo e guasti", data: "2025-10-20" },
+  ];
+
+  const [settings, setSettings] = useState({
+    nomeAzienda: "Autonoleggi Rossi",
+    email: "info@autonoleggiorossi.it",
+    tema: "Chiaro",
+  });
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState({
-    "2025-10-20": ["Prenotazione: Mario Rossi - Fiat Panda"],
+    "2025-11-01": ["Prenotazione: Mario Rossi - Fiat Panda"],
   });
 
-  // Funzioni per il calendario
-  const monthNames = [
-    "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
-    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
-  ];
-
-  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-  const daysInMonth = lastDayOfMonth.getDate();
-
-  const prevMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-    );
-  };
-
-  const nextMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-    );
-  };
-
-  const handleAddEvent = () => {
-    const text = prompt("Aggiungi prenotazione:");
-    if (!text) return;
-    const key = selectedDate.toISOString().split("T")[0];
-    setEvents((prev) => ({
-      ...prev,
-      [key]: prev[key] ? [...prev[key], text] : [text],
-    }));
-  };
-
-  const renderDays = () => {
-    const days = [];
-    const startDay = firstDayOfMonth.getDay() === 0 ? 7 : firstDayOfMonth.getDay();
-    const totalCells = daysInMonth + startDay - 1;
-
-    for (let i = 1; i < startDay; i++) {
-      days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
-    }
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), d);
-      const key = date.toISOString().split("T")[0];
-      const hasEvent = events[key];
-      const isSelected =
-        selectedDate &&
-        date.toDateString() === selectedDate.toDateString();
-
-      days.push(
-        <div
-          key={d}
-          className={`calendar-day ${isSelected ? "selected" : ""} ${
-            hasEvent ? "has-event" : ""
-          }`}
-          onClick={() => setSelectedDate(date)}
-        >
-          <span>{d}</span>
-          {hasEvent && <div className="dot"></div>}
-        </div>
-      );
-    }
-
-    return days;
-  };
-
-  const renderEventList = () => {
-    if (!selectedDate) return <p>Seleziona un giorno per visualizzare le prenotazioni.</p>;
-    const key = selectedDate.toISOString().split("T")[0];
-    const dayEvents = events[key] || [];
-    return (
-      <div className="event-panel">
-        <h3>{selectedDate.toLocaleDateString("it-IT")}</h3>
-        {dayEvents.length === 0 ? (
-          <p>Nessuna prenotazione.</p>
-        ) : (
-          <ul>
-            {dayEvents.map((ev, i) => (
-              <li key={i}>{ev}</li>
-            ))}
-          </ul>
-        )}
-        <button className="green-btn" onClick={handleAddEvent}>+ Aggiungi</button>
-      </div>
-    );
-  };
-
-  // Contenuto dinamico per ciascuna sezione
+  /* ======== RENDER COMPONENTI ======== */
   const renderContent = () => {
     switch (menuOpen) {
-      case "dashboard":
-        return (
-          <div className="section">
-            <h2>Benvenuto nella Dashboard</h2>
-            <p>Qui potrai avere una panoramica generale della tua attività di autonoleggio.</p>
-          </div>
-        );
+      
       case "cars":
-        return (
-          <div className="section">
-            <h2>Gestione Auto</h2>
-            <p>Visualizza, aggiungi e modifica i veicoli disponibili al noleggio.</p>
-          </div>
-        );
-      case "bookings":
-        return (
-          <div className="section">
-            <h2>Gestione Prenotazioni</h2>
-            <p>Controlla le prenotazioni attive e passate, gestisci i clienti e i veicoli associati.</p>
-          </div>
-        );
+        return <Cars openMenuButton={openMenuButton} cars={cars} setCars={setCars} />;
       case "clients":
-        return (
-          <div className="section">
-            <h2>Gestione Clienti</h2>
-            <p>Consulta l’anagrafica dei clienti e le loro prenotazioni.</p>
-          </div>
-        );
+        return <Clients openMenuButton={openMenuButton} clients={clients} setClients={setClients} />;
+      case "bookings":
+        return <Bookings openMenuButton={openMenuButton} bookings={bookings} setBookings={setBookings} />;
       case "payments":
-        return (
-          <div className="section">
-            <h2>Gestione Pagamenti</h2>
-            <p>Monitora i pagamenti in sospeso, completati e le transazioni giornaliere.</p>
-          </div>
-        );
+        return <Payments openMenuButton={openMenuButton} payments={payments} setPayments={setPayments} />;
       case "calendar":
-        return (
-          <div className="section calendar-section">
-            <h2>Calendario Prenotazioni</h2>
-            <div className="calendar-header">
-              <button onClick={prevMonth}>◀</button>
-              <h3>
-                {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-              </h3>
-              <button onClick={nextMonth}>▶</button>
-            </div>
-            <div className="calendar-grid">{renderDays()}</div>
-            {renderEventList()}
-          </div>
-        );
+        return <Calendar openMenuButton={openMenuButton} currentDate={currentDate} setCurrentDate={setCurrentDate} selectedDate={selectedDate} setSelectedDate={setSelectedDate} events={events} setEvents={setEvents} />;
       case "reports":
-        return (
-          <div className="section">
-            <h2>Report e Statistiche</h2>
-            <p>Visualizza i dati statistici delle prenotazioni, guadagni e performance.</p>
-          </div>
-        );
+        return <Reports openMenuButton={openMenuButton} reports={reports} />;
       case "settings":
-        return (
-          <div className="section">
-            <h2>Impostazioni del Sistema</h2>
-            <p>Configura le opzioni del gestionale e le impostazioni utente.</p>
-          </div>
-        );
+        return <Settings openMenuButton={openMenuButton} settings={settings} setSettings={setSettings} />;
       default:
-        return (
-          <div className="section">
-            <h2>Seleziona una sezione dal menu</h2>
-          </div>
-        );
+        return <div className="section">{openMenuButton}<h2>Seleziona una sezione dal menu</h2></div>;
     }
   };
 

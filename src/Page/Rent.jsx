@@ -242,7 +242,7 @@ export default function Rent() {
             <button
               className={`rent-btn ${!car.available ? "disabled" : ""}`}
               disabled={!car.available}
-              onClick={() => car.available && navigate(`/carrello`)}
+              onClick={() => car.available && navigate(`/prenotation/${id}`)}
             >
               {car.available ? "Prenota ora" : "Non disponibile"}
             </button>

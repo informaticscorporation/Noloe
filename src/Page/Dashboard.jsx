@@ -5,11 +5,12 @@ import "../UIX/Dashboard.css";
 
 export default function Dashboard() {
   const [menuOpen, setMenuOpen] = useState("dashboard");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="dashboard-container">
-      <Sidebar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      <HeroDashboard menuOpen={menuOpen} />
+      <Sidebar menuOpen={menuOpen} setMenuOpen={setMenuOpen} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+      <HeroDashboard menuOpen={menuOpen} setMenuOpen={setMenuOpen} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
     </div>
   );
 }
