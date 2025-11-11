@@ -21,7 +21,25 @@
   font-size: 2.5rem;
   font-weight: 700;
 }
+.success-notice {
+  background-color: #4caf50;
+  color: white;
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  text-align: center;
+  animation: fadeIn 0.5s;
+}
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.doc-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
 .subtitle {
   color: white;
   margin: 10px 0 30px 0;

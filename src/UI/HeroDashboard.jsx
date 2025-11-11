@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Menu } from "lucide-react";
 import "../UIX/Dashboard.css";
-
+import { supabase } from "../supabaseClient";
 
 import Cars from "./Cars";
 import Clients from "./Clients";
@@ -13,13 +13,15 @@ import Settings from "./Settings";
 
 export default function HeroDashboard({ menuOpen, setMobileMenuOpen }) {
   const [mobile, setMobile] = useState(false);
-
   useEffect(() => {
-    const handleResize = () => setMobile(window.innerWidth <= 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    const width = window.innerWidth;
+    if (width <= 768) {
+      setMobile(true);
+    } else {
+      setMobile(false);
+    }
+  })
+ 
 
   const openMenuButton = mobile ? (
     <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
@@ -28,17 +30,35 @@ export default function HeroDashboard({ menuOpen, setMobileMenuOpen }) {
   ) : null;
 
   /* ======== STATE CONDIVISI ======== */
-  const [cars, setCars] = useState([
-    { id: 1, modello: "Fiat Panda", targa: "AB123CD", stato: "Disponibile" },
-    { id: 2, modello: "Volkswagen Golf", targa: "EF456GH", stato: "Manutenzione" },
-    { id: 3, modello: "Jeep Renegade", targa: "IJ789KL", stato: "Occupata" },
-  ]);
+ const [cars, setCars] = useState([]);
+ useEffect(() => {
+    const dati = supabase.from("Macchine")
+    .select("*")
+    .then(({ data, error }) => {
+      if (error) {
+        console.error(error);
+      } else {
+        
+        setCars(data);
+      }
+    })
+  }, []);
 
-  const [clients, setClients] = useState([
-    { id: 1, nome: "Mario Rossi", telefono: "3331234567", email: "mario@esempio.com" },
-    { id: 2, nome: "Giulia Bianchi", telefono: "3409876543", email: "giulia@esempio.com" },
-  ]);
+  const [clients, setClients] = useState([]);
+  useEffect(() => {
+    const dati = supabase.from("Users")
+    .select("*")
+    .then(({ data, error }) => {
+      if (error) {
+        console.error(error);
+      } else {
+        
+        setClients(data);
+      }
+    })
+  }, []);
 
+ 
   const [bookings, setBookings] = useState([
     { id: 1, cliente: "Mario Rossi", auto: "Fiat Panda", data: "2025-11-01", stato: "Confermato" },
   ]);
@@ -87,5 +107,8 @@ export default function HeroDashboard({ menuOpen, setMobileMenuOpen }) {
     }
   };
 
-  return <div className="hero-dashboard-container">{renderContent()}</div>;
+  return <div className="hero-dashboard-container">
+  
+   
+    {renderContent()}</div>;
 }
