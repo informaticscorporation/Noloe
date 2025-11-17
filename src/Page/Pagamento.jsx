@@ -15,13 +15,13 @@ export default function Pagamento() {
 
   const initPayment = async () => {
     try {
-      const response = await fetch("https://server-noloe.fly.dev/init-payment", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*" // serve a volte per Vercel
-        },
-      });
+     const response = await fetch("https://server-noloe.fly.dev/init-payment", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
+
 
       const data = await response.json();
       setPaymentUrl(data.redirectURL);
