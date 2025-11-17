@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "../UIX/Pagamento.css"; // importa il CSS separato
+import "../UIX/Pagamento.css";
 
 export default function Pagamento() {
   const location = useLocation();
@@ -8,12 +8,31 @@ export default function Pagamento() {
   const reservationData = location.state;
 
   const [loading, setLoading] = useState(true);
+  const [paymentUrl, setPaymentUrl] = useState(null);
 
-  // Simula fetch pagamento
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2500);
-    return () => clearTimeout(timer);
-  }, []);
+  if (!reservationData) return;
+
+  const initPayment = async () => {
+    try {
+      // Chiamata GET al backend
+      const response = await fetch("https://server-noloe.fly.dev/init-payment", {
+        method: "GET",
+      });
+
+      const data = await response.json();
+      setPaymentUrl(data.redirectURL);
+    } catch (err) {
+      console.error("Errore inizializzazione pagamento:", err);
+      alert("Errore durante l'inizializzazione del pagamento!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  initPayment();
+}, [reservationData]);
+
 
   if (!reservationData) {
     return (
@@ -45,12 +64,15 @@ export default function Pagamento() {
             Totale da pagare: <span className="total-amount">{reservationData.total}€</span>
           </h3>
 
-          {/* MOCK iframe pagamento */}
-          <iframe
-            title="payment"
-            className="payment-iframe"
-            src="https://sandbox.example.fake-gateway/demo"
-          ></iframe>
+          {paymentUrl ? (
+            <iframe
+              title="payment"
+              className="payment-iframe"
+              src={paymentUrl}
+            ></iframe>
+          ) : (
+            <p>Errore nel caricamento del pagamento.</p>
+          )}
 
           <button
             className="btn-green"
