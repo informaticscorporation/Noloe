@@ -14,9 +14,12 @@ export default function Pagamento() {
    async function fetchPaymentUrl() {
      const response = await fetch("https://server-noloe.fly.dev/init-payment", )
      const data = await response.json();
+
      setPaymentUrl(data.url);
      setLoading(false);
    }
+
+   fetchPaymentUrl();
 }, []);
 
 
