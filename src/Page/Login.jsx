@@ -59,7 +59,7 @@ export default function Login() {
         sessionStorage.setItem("userId", userData.id);
         sessionStorage.setItem("admin", true);
         navigate("/dashboard");
-      } else if (userData.TipoUtente === "Cliente") {
+      } else if (userData.tipoUtente === "Cliente") {
         sessionStorage.setItem("userId", userData.id);
         navigate("/");
       } else {

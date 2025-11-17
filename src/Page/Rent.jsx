@@ -203,14 +203,7 @@ export default function Rent() {
               </div>
             )}
 
-            {car.comfort?.length > 0 && (
-              <div className="rent-section">
-                <h3>Comfort</h3>
-                <ul>
-                  {car.comfort.map((item, i) => <li key={i}>{item}</li>)}
-                </ul>
-              </div>
-            )}
+           
 
             {car.sicurezza?.length > 0 && (
               <div className="rent-section">

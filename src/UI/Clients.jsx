@@ -22,7 +22,7 @@ export default function Clients({ openMenuButton, clients, setClients }) {
     ragione_sociale: "",
     partita_iva: "",
     data_nascita: "",
-    tipo_utente: "cliente",
+    tipoUtente: "cliente",
     idCARDFrontimg: "",
     idCARDBackimg: "",
     patenteFront: "",
@@ -186,7 +186,7 @@ export default function Clients({ openMenuButton, clients, setClients }) {
                 <td>{client.cognome}</td>
                 <td>{client.email}</td>
                 <td>{client.telefono}</td>
-                <td>{client.tipo_utente}</td>
+                <td>{client.tipoUtente}</td>
                 <td>{client.data_nascita || "-"}</td>
                 <td>{client.codice_fiscale || "-"}</td>
                 <td>{client.ragione_sociale || "-"}</td>

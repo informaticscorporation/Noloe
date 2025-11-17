@@ -103,7 +103,7 @@ export default function Register() {
         cognome: form.cognome,
         email: form.email,
         telefono: form.telefono,
-        TipoUtente: "Cliente",
+        tipoUtente: "Cliente",
         password_hash: form.password,
         partita_iva: hasPiva ? form.piva : null,
         ragione_sociale: hasPiva ? form.business : null,
