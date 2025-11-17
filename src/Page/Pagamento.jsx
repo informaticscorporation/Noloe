@@ -10,14 +10,17 @@ export default function Pagamento() {
   const [loading, setLoading] = useState(true);
   const [paymentUrl, setPaymentUrl] = useState(null);
 
-  useEffect(() => {
+ useEffect(() => {
   if (!reservationData) return;
 
   const initPayment = async () => {
     try {
-      // Chiamata GET al backend
       const response = await fetch("https://server-noloe.fly.dev/init-payment", {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*" // serve a volte per Vercel
+        },
       });
 
       const data = await response.json();
