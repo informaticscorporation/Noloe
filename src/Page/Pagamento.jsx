@@ -8,26 +8,31 @@ export default function Pagamento() {
   const reservationData = location.state;
 
   const [loading, setLoading] = useState(true);
-  const [paymentUrl, setPaymentUrl] = useState(null);
 
   useEffect(() => {
     async function fetchPaymentUrl() {
       try {
         const response = await fetch("https://server-noloe.fly.dev/init-payment");
         const data = await response.json();
-        setPaymentUrl(data.url);
+
+        if (!data.url) {
+          throw new Error("URL pagamento non ricevuto");
+        }
+
+        // 👉 REDIRECT DIRETTO ALLA PAGINA DI PAGAMENTO
+        window.location.href = data.url;
+
       } catch (err) {
         console.error("Errore inizializzazione pagamento:", err);
         alert("Errore durante l'inizializzazione del pagamento!");
-      } finally {
-        setLoading(false);
+        navigate("/");
       }
     }
 
     if (reservationData) {
       fetchPaymentUrl();
     }
-  }, [reservationData]);
+  }, [reservationData, navigate]);
 
   if (!reservationData) {
     return (
@@ -42,37 +47,12 @@ export default function Pagamento() {
 
   return (
     <div className="pagamento-container">
-      <button className="back-btn" onClick={() => navigate(-1)}>← Indietro</button>
+      <h2>Reindirizzamento al pagamento…</h2>
 
-      <h2>Pagamento Prenotazione</h2>
-
-      {loading ? (
+      {loading && (
         <div className="loader-box">
           <div className="spinner"></div>
-          <p>Stiamo preparando il pagamento...</p>
-        </div>
-      ) : (
-        <div className="payment-box">
-          <h3>
-            Totale da pagare: <span className="total-amount">{reservationData.total}€</span>
-          </h3>
-
-          {paymentUrl ? (
-            <iframe
-              title="payment"
-              className="payment-iframe"
-              src={paymentUrl}
-            ></iframe>
-          ) : (
-            <p>Errore nel caricamento del pagamento.</p>
-          )}
-
-          <button
-            className="btn-green"
-            onClick={() => navigate("/successo")}
-          >
-            Simula pagamento completato ✅
-          </button>
+          <p>Preparazione pagamento...</p>
         </div>
       )}
     </div>
