@@ -21,8 +21,8 @@ export default function Pagamento() {
 
         if (!data.url) throw new Error("URL pagamento non ricevuto");
 
-        // 👉 REDIRECT DIRETTAMENTE ALLA PAGINA DI PAGAMENTO
-        window.location.href = data.url;
+        // 👉 REDIRECT nuova pagina DIRETTAMENTE ALLA PAGINA DI PAGAMENTO
+        window.open(data.url, "_blank")
 
       } catch (err) {
         console.error("Errore inizializzazione pagamento:", err);
