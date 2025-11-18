@@ -6,38 +6,56 @@ export default function Pagamento() {
   const location = useLocation();
   const navigate = useNavigate();
   const reservationData = location.state;
+  const path = location.pathname; // /pagamento oppure /pagamento/successo
 
   const [loading, setLoading] = useState(true);
   const [verifyResult, setVerifyResult] = useState(null);
 
-  const path = location.pathname; // /pagamento oppure /pagamento/successo
-
   useEffect(() => {
+    // =========================
+    // /pagamento → INIT PAYMENT
+    // =========================
+    async function initPayment() {
+      try {
+        const response = await fetch("https://server-noloe.fly.dev/init-payment");
+        const data = await response.json();
+
+        if (!data.url) throw new Error("URL pagamento non ricevuto");
+
+        // Apri pagamento in nuova scheda
+        window.open(data.url, "_blank");
+        setLoading(false);
+      } catch (err) {
+        console.error("Errore init-payment:", err);
+        alert("Errore durante l'inizializzazione del pagamento!");
+        navigate("/");
+      }
+    }
+
+    // =========================
+    // /pagamento/successo → VERIFY PAYMENT
+    // =========================
     async function verifyPayment() {
       try {
         const response = await fetch("https://server-noloe.fly.dev/verify-payment");
         const data = await response.json();
         setVerifyResult(data);
       } catch (err) {
-        console.error("Errore verify:", err);
+        console.error("Errore verify-payment:", err);
         setVerifyResult({ error: true });
       } finally {
         setLoading(false);
       }
     }
 
-    // 🔹 Se siamo su /pagamento/successo → verify
     if (path === "/pagamento/successo") {
       verifyPayment();
-    }
-
-    // 🔹 Se siamo su /pagamento e abbiamo dati → mostra spinner e attesa redirect
-    if (path === "/pagamento" && reservationData) {
-      setLoading(true); // in attesa che il server faccia redirect
-    } else if (!reservationData) {
+    } else if (path === "/pagamento" && reservationData) {
+      initPayment();
+    } else {
       setLoading(false);
     }
-  }, [reservationData, path]);
+  }, [path, reservationData, navigate]);
 
   // =========================
   // SCHERMATA POST VERIFY
@@ -92,7 +110,7 @@ export default function Pagamento() {
   }
 
   // =========================
-  // SCHERMATA PRE PAGAMENTO (/pagamento)
+  // SCHERMATA PRE PAGAMENTO
   // =========================
   if (!reservationData) {
     return (
@@ -105,14 +123,13 @@ export default function Pagamento() {
     );
   }
 
-  // Pagamento in corso (/pagamento)
   return (
     <div className="pagamento-container">
-      <h2>Pagamento in corso…</h2>
+      <h2>Reindirizzamento al pagamento…</h2>
       {loading && (
         <div className="loader-box">
           <div className="spinner"></div>
-          <p>Attendi conferma pagamento dal server...</p>
+          <p>Preparazione pagamento...</p>
         </div>
       )}
     </div>
