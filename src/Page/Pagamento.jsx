@@ -9,6 +9,7 @@ export default function Pagamento() {
 
   const query = new URLSearchParams(location.search);
   const callbackMode = query.get("callback") === "true";
+  const errorMode = query.get("error") === "true";
 
   const [loading, setLoading] = useState(true);
   const [verifyResult, setVerifyResult] = useState(null);
@@ -21,8 +22,11 @@ export default function Pagamento() {
 
         if (!data.url) throw new Error("URL pagamento non ricevuto");
 
-        // 👉 REDIRECT nuova pagina DIRETTAMENTE ALLA PAGINA DI PAGAMENTO
-        window.open(data.url, "_blank")
+        // 🔥 APRI PAGAMENTO IN UNA NUOVA SCHEDA
+        window.open(data.url, "_blank");
+
+        // 🔥 SMETTI DI MOSTRARE LO SPINNER
+        setLoading(false);
 
       } catch (err) {
         console.error("Errore inizializzazione pagamento:", err);
@@ -47,24 +51,31 @@ export default function Pagamento() {
       }
     }
 
-    // 🔥 SE TORNIAMO DAL GATEWAY — NON FARE INIT
+    // 🔥 SE RITORNI DAL GATEWAY → FAI VERIFY
     if (callbackMode) {
       verifyPayment();
       return;
     }
 
-    // 🔥 SE È LA PRIMA VOLTA (PRE-PAGAMENTO)
+    // 🔥 SE ERRORE DAL GATEWAY → MOSTRA MESSAGGIO
+    if (errorMode) {
+      setLoading(false);
+      setVerifyResult({ error: true });
+      return;
+    }
+
+    // 🔥 PRIMA VOLTA → ESEGUI INIT
     if (reservationData) {
       initPayment();
     }
 
-  }, [reservationData, callbackMode, navigate]);
+  }, [reservationData, callbackMode, errorMode, navigate]);
 
   // =========================
   //   SCHERMATA POST VERIFY
   // =========================
 
-  if (callbackMode) {
+  if (callbackMode || errorMode) {
     if (loading) {
       return (
         <div className="pagamento-container">
@@ -80,7 +91,8 @@ export default function Pagamento() {
     if (!verifyResult || verifyResult.error) {
       return (
         <div className="pagamento-container">
-          <h2>Errore nella verifica ❌</h2>
+          <h2>Pagamento non riuscito ❌</h2>
+          <p>Si è verificato un errore durante il pagamento.</p>
           <button className="btn-orange" onClick={() => navigate("/")}>
             Torna alla Home
           </button>
