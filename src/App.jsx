@@ -33,6 +33,7 @@ function App() {
           <Route element={<PrivateRoute isAuth={true} />}>
             <Route path="/prenotation/:id" element={<Pronotation />} />
             <Route path="/pagamento" element={<Pagamento/>} />
+            <Route path="/pagamento/successo" element={<Pagamento />} />
             <Route path="/userarea" element={<UserArea />} />
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>

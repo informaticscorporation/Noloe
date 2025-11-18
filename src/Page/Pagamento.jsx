@@ -7,12 +7,11 @@ export default function Pagamento() {
   const navigate = useNavigate();
   const reservationData = location.state;
 
-  const query = new URLSearchParams(location.search);
-  const callbackMode = query.get("callback") === "true";
-  const errorMode = query.get("error") === "true";
-
   const [loading, setLoading] = useState(true);
   const [verifyResult, setVerifyResult] = useState(null);
+
+  // Controllo del path
+  const path = location.pathname; // /pagamento oppure /pagamento/successo
 
   useEffect(() => {
     async function initPayment() {
@@ -22,10 +21,8 @@ export default function Pagamento() {
 
         if (!data.url) throw new Error("URL pagamento non ricevuto");
 
-        // 🔥 APRI PAGAMENTO IN UNA NUOVA SCHEDA
+        // Apri pagamento in nuova scheda
         window.open(data.url, "_blank");
-
-        // 🔥 SMETTI DI MOSTRARE LO SPINNER
         setLoading(false);
 
       } catch (err) {
@@ -39,10 +36,7 @@ export default function Pagamento() {
       try {
         const response = await fetch("https://server-noloe.fly.dev/verify-payment");
         const data = await response.json();
-
-        console.log("VERIFY RESULT:", data);
         setVerifyResult(data);
-
       } catch (err) {
         console.error("Errore verify:", err);
         setVerifyResult({ error: true });
@@ -51,31 +45,24 @@ export default function Pagamento() {
       }
     }
 
-    // 🔥 SE RITORNI DAL GATEWAY → FAI VERIFY
-    if (callbackMode) {
+    // 🔹 Se siamo su /pagamento/successo → verify
+    if (path === "/pagamento/successo") {
       verifyPayment();
       return;
     }
 
-    // 🔥 SE ERRORE DAL GATEWAY → MOSTRA MESSAGGIO
-    if (errorMode) {
-      setLoading(false);
-      setVerifyResult({ error: true });
-      return;
-    }
-
-    // 🔥 PRIMA VOLTA → ESEGUI INIT
+    // 🔹 Se siamo su /pagamento → init normale
     if (reservationData) {
       initPayment();
+    } else {
+      setLoading(false);
     }
-
-  }, [reservationData, callbackMode, errorMode, navigate]);
+  }, [reservationData, path, navigate]);
 
   // =========================
-  //   SCHERMATA POST VERIFY
+  // SCHERMATA POST VERIFY
   // =========================
-
-  if (callbackMode || errorMode) {
+  if (path === "/pagamento/successo") {
     if (loading) {
       return (
         <div className="pagamento-container">
@@ -125,12 +112,11 @@ export default function Pagamento() {
   }
 
   // =========================
-  //   SCHERMATA PRE PAGAMENTO
+  // SCHERMATA PRE PAGAMENTO
   // =========================
-
   if (!reservationData) {
     return (
-      <div className="payment-container">
+      <div className="pagamento-container">
         <h2>Nessuna prenotazione trovata ❌</h2>
         <button className="btn-orange" onClick={() => navigate("/")}>
           Torna alla Home
@@ -139,10 +125,10 @@ export default function Pagamento() {
     );
   }
 
+  // Pagamento in corso (/pagamento)
   return (
     <div className="pagamento-container">
       <h2>Reindirizzamento al pagamento…</h2>
-
       {loading && (
         <div className="loader-box">
           <div className="spinner"></div>
