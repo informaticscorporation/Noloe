@@ -10,28 +10,9 @@ export default function Pagamento() {
   const [loading, setLoading] = useState(true);
   const [verifyResult, setVerifyResult] = useState(null);
 
-  // Controllo del path
   const path = location.pathname; // /pagamento oppure /pagamento/successo
 
   useEffect(() => {
-    async function initPayment() {
-      try {
-        const response = await fetch("https://server-noloe.fly.dev/init-payment");
-        const data = await response.json();
-
-        if (!data.url) throw new Error("URL pagamento non ricevuto");
-
-        // Apri pagamento in nuova scheda
-        window.open(data.url, "_blank");
-        setLoading(false);
-
-      } catch (err) {
-        console.error("Errore inizializzazione pagamento:", err);
-        alert("Errore durante l'inizializzazione del pagamento!");
-        navigate("/");
-      }
-    }
-
     async function verifyPayment() {
       try {
         const response = await fetch("https://server-noloe.fly.dev/verify-payment");
@@ -48,16 +29,15 @@ export default function Pagamento() {
     // 🔹 Se siamo su /pagamento/successo → verify
     if (path === "/pagamento/successo") {
       verifyPayment();
-      return;
     }
 
-    // 🔹 Se siamo su /pagamento → init normale
-    if (reservationData) {
-      initPayment();
-    } else {
+    // 🔹 Se siamo su /pagamento e abbiamo dati → mostra spinner e attesa redirect
+    if (path === "/pagamento" && reservationData) {
+      setLoading(true); // in attesa che il server faccia redirect
+    } else if (!reservationData) {
       setLoading(false);
     }
-  }, [reservationData, path, navigate]);
+  }, [reservationData, path]);
 
   // =========================
   // SCHERMATA POST VERIFY
@@ -112,7 +92,7 @@ export default function Pagamento() {
   }
 
   // =========================
-  // SCHERMATA PRE PAGAMENTO
+  // SCHERMATA PRE PAGAMENTO (/pagamento)
   // =========================
   if (!reservationData) {
     return (
@@ -128,11 +108,11 @@ export default function Pagamento() {
   // Pagamento in corso (/pagamento)
   return (
     <div className="pagamento-container">
-      <h2>Reindirizzamento al pagamento…</h2>
+      <h2>Pagamento in corso…</h2>
       {loading && (
         <div className="loader-box">
           <div className="spinner"></div>
-          <p>Preparazione pagamento...</p>
+          <p>Attendi conferma pagamento dal server...</p>
         </div>
       )}
     </div>
