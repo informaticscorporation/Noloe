@@ -22,9 +22,10 @@ export default function Pagamento() {
 
         if (!data.url) throw new Error("URL pagamento non ricevuto");
 
-        // Apri pagamento in nuova scheda
-        window.open(data.url, "_blank");
+        // redirezione al sito di pagamento
+        
         setLoading(false);
+        window.location.href = data.url;
       } catch (err) {
         console.error("Errore init-payment:", err);
         alert("Errore durante l'inizializzazione del pagamento!");
@@ -92,7 +93,7 @@ export default function Pagamento() {
         {result === "IGFS_000" ? (
           <>
             <h2>Pagamento completato con successo ✅</h2>
-            <button className="btn-green" onClick={() => navigate("/successo")}>
+            <button className="btn-green" onClick={() => navigate("pagamento/successo")}>
               Continua
             </button>
           </>
