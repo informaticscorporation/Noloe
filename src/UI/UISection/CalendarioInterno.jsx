@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import "../../UIX/CalendarBooking.css";
 
 export default function CalendarioInterno() {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [notesMap, setNotesMap] = useState({}); // key: "YYYY-MM-DD" -> note
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [noteInput, setNoteInput] = useState("");
+  const [notesMap, setNotesMap] = useState({}); // key: "YYYY-MM-DD" -> { bollo, assicurazione, contratto, note }
+  const [hoverCard, setHoverCard] = useState(null);
 
   const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -16,89 +16,129 @@ export default function CalendarioInterno() {
   ];
 
   const formatDateKey = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
   };
 
-  const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  const prevMonth = () =>
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+  const nextMonth = () =>
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
 
-  const handleDayClick = (date) => {
-    const key = formatDateKey(date);
-    setSelectedDate(key);
-    setNoteInput(notesMap[key] || "");
-  };
-
-  const handleSaveNote = () => {
-    if (!selectedDate) return;
-    setNotesMap((prev) => ({ ...prev, [selectedDate]: noteInput }));
-    setSelectedDate(null);
-    setNoteInput("");
-  };
-
-  const renderDays = () => {
-    const days = [];
-    const startDay = firstDay.getDay() === 0 ? 7 : firstDay.getDay();
-
-    for (let i = 1; i < startDay; i++) {
-      days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
-    }
-
+  const monthDayKeys = useMemo(() => {
+    const keys = [];
     for (let d = 1; d <= daysInMonth; d++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), d);
-      const key = formatDateKey(date);
-      const noteExists = notesMap[key];
-      const isSelected = selectedDate === key;
-
-      days.push(
-        <div
-          key={key}
-          onClick={() => handleDayClick(date)}
-          className="calendar-day"
-          style={{
-            backgroundColor: isSelected ? "#4da6ff" : noteExists ? "#ffe599" : "#f9fafb",
-            color: isSelected ? "#fff" : "#000"
-          }}
-        >
-          <span>{d}</span>
-          {noteExists && !isSelected && <span style={{ fontSize: 10 }}>📝</span>}
-        </div>
-      );
+      keys.push(formatDateKey(new Date(currentDate.getFullYear(), currentDate.getMonth(), d)));
     }
+    return keys;
+  }, [currentDate, daysInMonth]);
 
-    return days;
+  // Apre la card per modificare le note/scadenze
+  const openNotePanel = (e, dateKey, type) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const padding = 10;
+    const panelWidth = 300;
+    const panelHeight = 240;
+
+    let left = rect.right + 8;
+    let top = rect.top;
+    if (left + panelWidth > window.innerWidth - padding) left = rect.left - panelWidth - 8;
+    if (top + panelHeight > window.innerHeight - padding) top = window.innerHeight - panelHeight - padding;
+
+    const existing = notesMap[dateKey] || {};
+    setHoverCard({
+      x: left,
+      y: top,
+      dateKey,
+      type,
+      text: existing[type] || "",
+    });
+  };
+
+  const saveNote = () => {
+    if (!hoverCard) return;
+    setNotesMap(prev => ({
+      ...prev,
+      [hoverCard.dateKey]: {
+        ...prev[hoverCard.dateKey],
+        [hoverCard.type]: hoverCard.text
+      }
+    }));
+    setHoverCard(null);
+  };
+
+  const noteTypes = ["bollo", "assicurazione", "contratto", "altre_note"];
+  const noteLabels = {
+    bollo: "Bollo",
+    assicurazione: "Assicurazione",
+    contratto: "Contratto",
+    altre_note: "Note"
   };
 
   return (
-    <div className="calendar-section">
-      <h2>Calendario Note</h2>
-
-      <div className="calendar-header">
+    <div className="cal-table-container">
+      <div className="cal-table-header">
         <button onClick={prevMonth}>◀</button>
         <h3>{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</h3>
         <button onClick={nextMonth}>▶</button>
       </div>
 
-      <div className="calendar-grid">{renderDays()}</div>
+      <div className="cal-table" style={{ "--days": daysInMonth }}>
+        <div className="cal-row cal-row-header">
+          <div className="cal-col cal-col-vehicle">Tipo/Scadenza</div>
+          {monthDayKeys.map((k, idx) => (
+            <div key={k} className="cal-col cal-col-day">
+              <div className="day-number">{idx + 1}</div>
+            </div>
+          ))}
+        </div>
 
-      {selectedDate && (
-        <div className="event-panel">
-          <h4>Nota per {selectedDate}</h4>
+        {noteTypes.map(type => (
+          <div key={type} className="cal-row">
+            <div className="cal-col cal-col-vehicle">
+              <div className="veh-label">
+                <div className="veh-model">{noteLabels[type]}</div>
+              </div>
+            </div>
+
+            {monthDayKeys.map(k => {
+              const hasNote = notesMap[k]?.[type];
+              const className = hasNote ? "cell-booked" : "cell-free";
+              return (
+                <div
+                  key={`${k}-${type}`}
+                  className={`cal-col cal-col-day-cell ${className}`}
+                  onClick={(e) => openNotePanel(e, k, type)}
+                >
+                  <div className="cell-value">{hasNote ? "📝" : ""}</div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      {hoverCard && (
+        <div
+          className="hover-card"
+          style={{ top: hoverCard.y, left: hoverCard.x }}
+        >
+          <div className="hover-card-header">
+            <strong>{noteLabels[hoverCard.type]}</strong>
+            <div className="hover-date">{hoverCard.dateKey}</div>
+          </div>
+
           <textarea
-            value={noteInput}
-            onChange={(e) => setNoteInput(e.target.value)}
-            rows={4}
-            style={{ width: "100%", borderRadius: 6, padding: 4 }}
+            value={hoverCard.text}
+            onChange={e => setHoverCard(prev => ({ ...prev, text: e.target.value }))}
+            rows={5}
+            style={{ width: "100%", borderRadius: 6, marginTop: 6 }}
           />
-          <button
-            onClick={handleSaveNote}
-            className="show-btn"
-            style={{ marginTop: 8 }}
-          >
-            Salva Nota
-          </button>
+
+          <button className="show-btn" onClick={saveNote} style={{ marginTop: 8 }}>Salva</button>
+          <button className="show-btn" onClick={() => setHoverCard(null)} style={{ marginTop: 4, background: "#444" }}>Chiudi</button>
         </div>
       )}
     </div>

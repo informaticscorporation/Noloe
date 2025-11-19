@@ -6,6 +6,8 @@ import BookingSection from "./UISection/BookingSection";
 import CalendarBooking from "./UISection/CalendarBooking";
 import DashboardSection from "./UISection/DashboardSection";
 import CalendarioInterno from "./UISection/CalendarioInterno";
+import ClientiSection from "./UISection/ClientiSection";
+import PagamentiSection from "./UISection/PagamentiSection";
 
 export default function HeroDashboard({ menuOpen, setMobileMenuOpen }) {
   const [mobile, setMobile] = useState(false);
@@ -40,9 +42,9 @@ export default function HeroDashboard({ menuOpen, setMobileMenuOpen }) {
         return <div className="section">{openMenuButton}<CalendarioInterno /></div>;
      
       case "clients":
-        return <div className="section">{openMenuButton}<h1>Clienti</h1></div>;
+        return <div className="section">{openMenuButton}<ClientiSection /></div>;
       case "payments":
-        return <div className="section">{openMenuButton}<h1>Pagamenti</h1></div>;
+        return <div className="section">{openMenuButton}<PagamentiSection /></div>;
       case "reports":
         return <div className="section">{openMenuButton}<h1>Report</h1></div>;
       case "settings":

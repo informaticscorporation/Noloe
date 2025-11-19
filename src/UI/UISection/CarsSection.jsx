@@ -49,7 +49,35 @@ export default function CarsSection() {
     statointerni: "",
     statoclimatizzazione: "",
     statoluci: "",
-    statosospenzioni: ""
+    statosospenzioni: "",
+    // Nuove colonne
+    company_name: "",
+    versione: "",
+    cilindrata: "",
+    n_telaio: "",
+    ex_targa: "",
+    data_cambio_targa: "",
+    tipo_carburante: "",
+    serbatoio: "",
+    livello_carburante: "",
+    stato_veicolo: "",
+    park: "",
+    gruppo: "",
+    sede: "",
+    proprietario: "",
+    sistema_localizzazione: "",
+    codice_veicolo: "",
+    uso_veicolo: "",
+    pneumatici: "",
+    misura_pneumatici: "",
+    proprieta_pneumatici: "",
+    fleet_network: "",
+    gomme_invernali: false,
+    neopatentati: false,
+    printed_note: "",
+    promo_car: false,
+    fuori_servizio: false,
+    rent_to_rent: false
   };
 
   const [newVehicle, setNewVehicle] = useState(initialVehicleState);
@@ -124,7 +152,7 @@ export default function CarsSection() {
     return letters + numbers;
   };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 5));
+  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 6));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   const handleSaveVehicle = async () => {
@@ -135,7 +163,7 @@ export default function CarsSection() {
       "porte","kmattuali","prezzogiornaliero","valoreattualestimato",
       "franchigia","numeroassistenzastradale","assicurazionebasic",
       "assicurazioneconfort","assicurazionepremium","assicurazionesupertotal",
-      "valoredacquisto"
+      "valoredacquisto","cilindrata"
     ];
     numericFields.forEach(f => {
       if (vehicleToInsert[f] === "" || vehicleToInsert[f] === null) vehicleToInsert[f] = null;
@@ -144,7 +172,7 @@ export default function CarsSection() {
 
     const dateFields = [
       "ultimamanutenzione","prossimamanutenzione","ultimaprenotazione",
-      "dataingressoflotta","datadismissioneprevista"
+      "dataingressoflotta","datadismissioneprevista","data_cambio_targa"
     ];
     dateFields.forEach(f => { if (!vehicleToInsert[f]) vehicleToInsert[f] = null; });
 
@@ -158,8 +186,8 @@ export default function CarsSection() {
     }
 
     const { error } = vehicleToInsert.id && vehicles.some(v => v.id === vehicleToInsert.id)
-      ? await supabase.from("Vehicles").update(vehicleToInsert).eq("id", vehicleToInsert.id) // modifica
-      : await supabase.from("Vehicles").insert([vehicleToInsert]); // nuovo
+      ? await supabase.from("Vehicles").update(vehicleToInsert).eq("id", vehicleToInsert.id)
+      : await supabase.from("Vehicles").insert([vehicleToInsert]);
 
     if (error) console.log(error);
     else {
@@ -212,6 +240,14 @@ export default function CarsSection() {
               <th>In Manut.</th>
               <th>Ult. Manut.</th>
               <th>Categoria</th>
+              <th>Company</th>
+              <th>Versione</th>
+              <th>N Telaio</th>
+              <th>Ex Targa</th>
+              <th>Data Cambio Targa</th>
+              <th>Tipo Carburante</th>
+              <th>Stato Veicolo</th>
+              <th>Rent to Rent</th>
             </tr>
           </thead>
           <tbody>
@@ -236,6 +272,14 @@ export default function CarsSection() {
                 <td>{v.inmanutenzione ? "Sì" : "No"}</td>
                 <td>{v.ultimamanutenzione}</td>
                 <td>{v.categoria}</td>
+                <td>{v.company_name}</td>
+                <td>{v.versione}</td>
+                <td>{v.n_telaio}</td>
+                <td>{v.ex_targa}</td>
+                <td>{v.data_cambio_targa}</td>
+                <td>{v.tipo_carburante}</td>
+                <td>{v.stato_veicolo}</td>
+                <td>{v.rent_to_rent ? "Sì" : "No"}</td>
               </tr>
             ))}
           </tbody>
@@ -248,135 +292,90 @@ export default function CarsSection() {
           <div className="popup-content">
             <button className="popup-close" onClick={() => setPopupOpen(false)}>×</button>
             <h2>{newVehicle.id ? "Modifica Auto" : "Aggiungi Auto"}</h2>
+{/* STEP 1: Informazioni base */}
+{currentStep === 1 && (
+  <div className="form-step active">
+    <FormField label="Marca" name="marca" value={newVehicle.marca} onChange={handleInputChange} />
+    <FormField label="Modello" name="modello" value={newVehicle.modello} onChange={handleInputChange} />
+    <FormField label="Categoria" name="categoria" value={newVehicle.categoria} onChange={handleInputChange} />
+    <FormField label="Targa" name="targa" value={newVehicle.targa} onChange={handleInputChange} />
+    <FormField label="Colore" name="colore" value={newVehicle.colore} onChange={handleInputChange} />
+    <FormField label="Alimentazione" name="alimentazione" value={newVehicle.alimentazione} onChange={handleInputChange} />
+    <FormField label="Cambio" name="cambio" value={newVehicle.cambio} onChange={handleInputChange} />
+    <FormField label="Porte" type="number" name="porte" value={newVehicle.porte} onChange={handleInputChange} />
+    <FormField label="Immagine Auto" type="file" name="immaggineauto" onChange={handleInputChange} accept="image/*" />
+  </div>
+)}
 
-             {/* STEP 1: immagine */}
-      {currentStep === 1 && (
-        <div className="form-step active">
-          <div
-            className={`custom-file-input ${dragOver ? "drag-over" : ""}`}
-            onClick={() => document.getElementById("fileInput").click()}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setDragOver(false);
-              if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                handleInputChange({ target: { name: "immaggineauto", files: e.dataTransfer.files } });
-              }
-            }}
-          >
-            {newVehicle.immaggineauto ? (
-              <img
-                src={
-                  newVehicle.immaggineauto instanceof File
-                    ? URL.createObjectURL(newVehicle.immaggineauto)
-                    : `https://jurzdzkpkfxsoehfxgeg.supabase.co/storage/v1/object/public/Archivio/Auto/${newVehicle.immaggineauto}`
-                }
-                alt="Anteprima Auto"
-              />
-            ) : (
-              <span>Clicca o trascina un'immagine qui</span>
-            )}
-            <input
-              type="file"
-              id="fileInput"
-              name="immaggineauto"
-              accept="image/*"
-              onChange={handleInputChange}
-              style={{ display: "none" }}
-            />
-          </div>
-        </div>
-      )}
+{/* STEP 2: Valori e prezzi */}
+{currentStep === 2 && (
+  <div className="form-step active">
+    <FormField label="Km Attuali" type="number" name="kmattuali" value={newVehicle.kmattuali} onChange={handleInputChange} />
+    <FormField label="Prezzo Giornaliero" type="number" name="prezzogiornaliero" value={newVehicle.prezzogiornaliero} onChange={handleInputChange} />
+    <FormField label="Valore Attuale Stimato" type="number" name="valoreattualestimato" value={newVehicle.valoreattualestimato} onChange={handleInputChange} />
+    <FormField label="Franchigia" type="number" name="franchigia" value={newVehicle.franchigia} onChange={handleInputChange} />
+    <FormField label="Numero Assistenza Stradale" type="number" name="numeroassistenzastradale" value={newVehicle.numeroassistenzastradale} onChange={handleInputChange} />
+  </div>
+)}
 
-      {/* STEP 2: dettagli base */}
-      {currentStep === 2 && (
-        <div className="form-step active">
-          <FormField label="Marca" name="marca" value={newVehicle.marca} onChange={handleInputChange} />
-          <FormField label="Modello" name="modello" value={newVehicle.modello} onChange={handleInputChange} />
-          <FormField label="Targa" name="targa" value={newVehicle.targa} onChange={handleInputChange} />
-          <FormField label="Colore" name="colore" value={newVehicle.colore} onChange={handleInputChange} />
-          <FormField
-            label="Alimentazione"
-            type="select"
-            name="alimentazione"
-            value={newVehicle.alimentazione}
-            onChange={handleInputChange}
-            options={[
-              { value: "", label: "Seleziona" },
-              { value: "benzina", label: "Benzina" },
-              { value: "diesel", label: "Diesel" },
-              { value: "elettrico", label: "Elettrico" },
-              { value: "ibrido", label: "Ibrido" }
-            ]}
-          />
-          <FormField
-            label="Cambio"
-            type="select"
-            name="cambio"
-            value={newVehicle.cambio}
-            onChange={handleInputChange}
-            options={[
-              { value: "", label: "Seleziona" },
-              { value: "manuale", label: "Manuale" },
-              { value: "automatico", label: "Automatico" }
-            ]}
-          />
-        </div>
-      )}
+{/* STEP 3: Assicurazioni */}
+{currentStep === 3 && (
+  <div className="form-step active">
+    <FormField label="Assicurazione Basic" type="number" name="assicurazionebasic" value={newVehicle.assicurazionebasic} onChange={handleInputChange} />
+    <FormField label="Assicurazione Confort" type="number" name="assicurazioneconfort" value={newVehicle.assicurazioneconfort} onChange={handleInputChange} />
+    <FormField label="Assicurazione Premium" type="number" name="assicurazionepremium" value={newVehicle.assicurazionepremium} onChange={handleInputChange} />
+    <FormField label="Assicurazione Super Total" type="number" name="assicurazionesupertotal" value={newVehicle.assicurazionesupertotal} onChange={handleInputChange} />
+  </div>
+)}
 
-      {/* STEP 3: dettagli tecnici */}
-      {currentStep === 3 && (
-        <div className="form-step active">
-          <FormField label="Porte" type="number" name="porte" value={newVehicle.porte} onChange={handleInputChange} />
-          <FormField label="KM Attuali" type="number" name="kmattuali" value={newVehicle.kmattuali} onChange={handleInputChange} />
-          <FormField label="Prezzo Giornaliero" type="number" name="prezzogiornaliero" value={newVehicle.prezzogiornaliero} onChange={handleInputChange} />
-          <FormField label="Valore Attuale Stimato" type="number" name="valoreattualestimato" value={newVehicle.valoreattualestimato} onChange={handleInputChange} />
-          <FormField label="Franchigia" type="number" name="franchigia" value={newVehicle.franchigia} onChange={handleInputChange} />
-          <FormField label="Valore d'acquisto" type="number" name="valoredacquisto" value={newVehicle.valoredacquisto} onChange={handleInputChange} />
-          <FormField label="In Manutenzione" type="checkbox" name="inmanutenzione" value={newVehicle.inmanutenzione} onChange={handleInputChange} />
-        </div>
-      )}
+{/* STEP 4: Date e manutenzioni */}
+{currentStep === 4 && (
+  <div className="form-step active">
+    <FormField label="Ultima Manutenzione" type="date" name="ultimamanutenzione" value={newVehicle.ultimamanutenzione} onChange={handleInputChange} />
+    <FormField label="Prossima Manutenzione" type="date" name="prossimamanutenzione" value={newVehicle.prossimamanutenzione} onChange={handleInputChange} />
+    <FormField label="Ultima Prenotazione" type="date" name="ultimaprenotazione" value={newVehicle.ultimaprenotazione} onChange={handleInputChange} />
+    <FormField label="In Manutenzione" type="checkbox" name="inmanutenzione" value={newVehicle.inmanutenzione} onChange={handleInputChange} />
+    <FormField label="Data Ingresso Flotta" type="date" name="dataingressoflotta" value={newVehicle.dataingressoflotta} onChange={handleInputChange} />
+    <FormField label="Data Dismissione Prevista" type="date" name="datadismissioneprevista" value={newVehicle.datadismissioneprevista} onChange={handleInputChange} />
+  </div>
+)}
 
-      {/* STEP 4: date e assicurazioni */}
-      {currentStep === 4 && (
-        <div className="form-step active">
-          <FormField label="Ultima Manutenzione" type="date" name="ultimamanutenzione" value={newVehicle.ultimamanutenzione} onChange={handleInputChange} />
-          <FormField label="Prossima Manutenzione" type="date" name="prossimamanutenzione" value={newVehicle.prossimamanutenzione} onChange={handleInputChange} />
-          <FormField label="Ultima Prenotazione" type="date" name="ultimaprenotazione" value={newVehicle.ultimaprenotazione} onChange={handleInputChange} />
-          <FormField label="Data Ingresso Flotta" type="date" name="dataingressoflotta" value={newVehicle.dataingressoflotta} onChange={handleInputChange} />
-          <FormField label="Data Dismissione Prevista" type="date" name="datadismissioneprevista" value={newVehicle.datadismissioneprevista} onChange={handleInputChange} />
-          <FormField label="Assistenza Stradale" type="number" name="numeroassistenzastradale" value={newVehicle.numeroassistenzastradale} onChange={handleInputChange} />
-          <FormField label="Ass. Basic" type="number" name="assicurazionebasic" value={newVehicle.assicurazionebasic} onChange={handleInputChange} />
-          <FormField label="Ass. Confort" type="number" name="assicurazioneconfort" value={newVehicle.assicurazioneconfort} onChange={handleInputChange} />
-          <FormField label="Ass. Premium" type="number" name="assicurazionepremium" value={newVehicle.assicurazionepremium} onChange={handleInputChange} />
-          <FormField label="Ass. Super Total" type="number" name="assicurazionesupertotal" value={newVehicle.assicurazionesupertotal} onChange={handleInputChange} />
-          <FormField label="Fornitore / Leasing" name="fornitoreoleasing" value={newVehicle.fornitoreoleasing} onChange={handleInputChange} />
-          <FormField label="Note Interno" name="noteinterne" value={newVehicle.noteinterne} onChange={handleInputChange} />
-          <FormField label="Categoria" name="categoria" value={newVehicle.categoria} onChange={handleInputChange} />
-        </div>
-      )}
+{/* STEP 5: Stato veicolo e condizioni */}
+{currentStep === 5 && (
+  <div className="form-step active">
+    <FormField label="Stato Freni" name="statofreni" value={newVehicle.statofreni} onChange={handleInputChange} />
+    <FormField label="Stato Olio Motore" name="statooliomotore" value={newVehicle.statooliomotore} onChange={handleInputChange} />
+    <FormField label="Stato Liquido Raffreddamento" name="statoliquidodiraffredamento" value={newVehicle.statoliquidodiraffredamento} onChange={handleInputChange} />
+    <FormField label="Stato Liquido Freni" name="statoliquidofreni" value={newVehicle.statoliquidofreni} onChange={handleInputChange} />
+    <FormField label="Stato Carrozzeria" name="statocarrozzeria" value={newVehicle.statocarrozzeria} onChange={handleInputChange} />
+    <FormField label="Stato Vetri e Specchietti" name="statovetrispecchietti" value={newVehicle.statovetrispecchietti} onChange={handleInputChange} />
+    <FormField label="Stato Interni" name="statointerni" value={newVehicle.statointerni} onChange={handleInputChange} />
+    <FormField label="Stato Climatizzazione" name="statoclimatizzazione" value={newVehicle.statoclimatizzazione} onChange={handleInputChange} />
+    <FormField label="Stato Luci" name="statoluci" value={newVehicle.statoluci} onChange={handleInputChange} />
+    <FormField label="Stato Sospensioni" name="statosospenzioni" value={newVehicle.statosospenzioni} onChange={handleInputChange} />
+  </div>
+)}
 
-      {/* STEP 5: stato veicolo */}
-      {currentStep === 5 && (
-        <div className="form-step active">
-          <FormField label="Stato Freni" name="statofreni" value={newVehicle.statofreni} onChange={handleInputChange} />
-          <FormField label="Stato Olio Motore" name="statooliomotore" value={newVehicle.statooliomotore} onChange={handleInputChange} />
-          <FormField label="Stato Liquido Raffreddamento" name="statoliquidodiraffredamento" value={newVehicle.statoliquidodiraffredamento} onChange={handleInputChange} />
-          <FormField label="Stato Liquido Freni" name="statoliquidofreni" value={newVehicle.statoliquidofreni} onChange={handleInputChange} />
-          <FormField label="Stato Carrozzeria" name="statocarrozzeria" value={newVehicle.statocarrozzeria} onChange={handleInputChange} />
-          <FormField label="Vetri / Specchietti" name="statovetrispecchietti" value={newVehicle.statovetrispecchietti} onChange={handleInputChange} />
-          <FormField label="Interni" name="statointerni" value={newVehicle.statointerni} onChange={handleInputChange} />
-          <FormField label="Climatizzazione" name="statoclimatizzazione" value={newVehicle.statoclimatizzazione} onChange={handleInputChange} />
-          <FormField label="Luci" name="statoluci" value={newVehicle.statoluci} onChange={handleInputChange} />
-          <FormField label="Sospensioni" name="statosospenzioni" value={newVehicle.statosospenzioni} onChange={handleInputChange} />
-        </div>
-      )}
+{/* STEP 6: Colonne extra */}
+{currentStep === 6 && (
+  <div className="form-step active">
+    <FormField label="Company Name" name="company_name" value={newVehicle.company_name} onChange={handleInputChange} />
+    <FormField label="Versione" name="versione" value={newVehicle.versione} onChange={handleInputChange} />
+    <FormField label="Cilindrata" type="number" name="cilindrata" value={newVehicle.cilindrata} onChange={handleInputChange} />
+    <FormField label="N Telaio" name="n_telaio" value={newVehicle.n_telaio} onChange={handleInputChange} />
+    <FormField label="Ex Targa" name="ex_targa" value={newVehicle.ex_targa} onChange={handleInputChange} />
+    <FormField label="Data Cambio Targa" type="date" name="data_cambio_targa" value={newVehicle.data_cambio_targa} onChange={handleInputChange} />
+    <FormField label="Tipo Carburante" name="tipo_carburante" value={newVehicle.tipo_carburante} onChange={handleInputChange} />
+    <FormField label="Stato Veicolo" name="stato_veicolo" value={newVehicle.stato_veicolo} onChange={handleInputChange} />
+    <FormField label="Rent to Rent" type="checkbox" name="rent_to_rent" value={newVehicle.rent_to_rent} onChange={handleInputChange} />
+  </div>
+)}
+
 
             <div className="step-navigation">
               {currentStep > 1 && <button className="popup-btn" onClick={prevStep}>Indietro</button>}
-              {currentStep < 5 && <button className="popup-btn" onClick={nextStep}>Avanti</button>}
-              {currentStep === 5 && (
+              {currentStep < 6 && <button className="popup-btn" onClick={nextStep}>Avanti</button>}
+              {currentStep === 6 && (
                 <>
                   <button className="popup-btn" type="submit" onClick={handleSaveVehicle}>Salva</button>
                   {newVehicle.id && (
@@ -385,7 +384,8 @@ export default function CarsSection() {
                       onClick={async () => {
                         if (window.confirm("Sei sicuro di voler eliminare questo veicolo?")) {
                           const { error } = await supabase.from("Vehicles").delete().eq("id", newVehicle.id);
-                          if (error) console.log(error);
+                          const { error: error2 } = await supabase.storage.from("Archivio").remove([`Auto/${newVehicle.immaggineauto}`]);
+                          if (error || error2) console.log(error || error2);
                           else {
                             fetchVehicles();
                             setPopupOpen(false);
