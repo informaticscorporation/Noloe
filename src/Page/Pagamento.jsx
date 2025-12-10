@@ -17,7 +17,7 @@ export default function Pagamento() {
     // =========================
     async function initPayment() {
       try {
-        const response = await fetch("https://server-noloe.fly.dev/init-payment");
+        const response = await fetch("https://server-noloe.fly.dev/init-payment-sale");
         const data = await response.json();
 
         if (!data.url) throw new Error("URL pagamento non ricevuto");
