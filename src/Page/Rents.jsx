@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { Filter, Car, X, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../UIX/Rents.css";
+import { supabase } from "../supabaseClient";
 
-// --- COMPONENTE ANIMAZIONE ---
+/* --- COMPONENTE ANIMAZIONE --- */
 function AnimatedCard({ children, index = 0, from = "bottom", delay = 0.2 }) {
   const ref = useRef();
   const [visible, setVisible] = useState(false);
@@ -45,10 +46,13 @@ function AnimatedCard({ children, index = 0, from = "bottom", delay = 0.2 }) {
   );
 }
 
-// --- COMPONENTE PRINCIPALE ---
+/* --- COMPONENTE PRINCIPALE --- */
 export default function Rents() {
   const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(false);
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [filters, setFilters] = useState({
     name: "",
     price: "",
@@ -56,27 +60,56 @@ export default function Rents() {
     available: "",
   });
 
-  const carCollection = [
-    { name: "BMW X5", img: "https://pngimg.com/d/bmw_PNG99543.png", price: "$120/day", category: "SUV", available: true },
-    { name: "Audi A6", img: "https://www.pngarts.com/files/11/Audi-A6-PNG-High-Quality-Image.png", price: "$100/day", category: "Berlina", available: false },
-    { name: "Tesla Model 3", img: "https://www.pngarts.com/files/11/Tesla-Model-S-PNG-Image-Background.png", price: "$150/day", category: "Elettrica", available: true },
-    { name: "Ford Mustang", img: "https://www.pngarts.com/files/3/Ford-Mustang-PNG-High-Quality-Image.png", price: "$140/day", category: "Sportiva", available: true },
-  ];
+  /* -------- Fetch Supabase -------- */
+  useEffect(() => {
+    const fetchCars = async () => {
+      const { data, error } = await supabase
+        .from("Vehicles")
+        .select(`
+          id,
+          marca,
+          modello,
+          categoria,
+          prezzogiornaliero,
+          immaggineauto,
+          fuori_servizio,
+          inmanutenzione
+        `)
+        .order("datacreazione", { ascending: false });
 
-  // Moltiplica le auto per riempire la pagina
-  const cars = Array(3).fill(null).flatMap(() => carCollection);
+      if (error) {
+        console.error(error);
+        setCars([]);
+      } else {
+        const normalized = (data || []).map((v) => ({
+          ...v,
+          disponibile: v.fuori_servizio === false && v.inmanutenzione === false,
+        }));
+        setCars(normalized);
+      }
 
-  const filteredCars = cars.filter(
-    (car) =>
+      setLoading(false);
+    };
+
+    fetchCars();
+  }, []);
+
+  /* -------- Filtri -------- */
+  const filteredCars = cars.filter((car) => {
+    const fullName = `${car.marca} ${car.modello}`.toLowerCase();
+
+    return (
       (filters.name === "" ||
-        car.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-      (filters.price === "" || car.price.includes(filters.price)) &&
+        fullName.includes(filters.name.toLowerCase())) &&
+      (filters.price === "" ||
+        String(car.prezzogiornaliero || "").includes(filters.price)) &&
       (filters.category === "" ||
-        car.category.toLowerCase().includes(filters.category.toLowerCase())) &&
+        car.categoria?.toLowerCase().includes(filters.category.toLowerCase())) &&
       (filters.available === "" ||
-        (filters.available === "yes" && car.available) ||
-        (filters.available === "no" && !car.available))
-  );
+        (filters.available === "yes" && car.disponibile) ||
+        (filters.available === "no" && !car.disponibile))
+    );
+  });
 
   return (
     <div className="rents-container">
@@ -91,11 +124,12 @@ export default function Rents() {
           </h1>
         </div>
 
-        <button
-          className="filter-btn"
-          onClick={() => setShowFilter(!showFilter)}
-        >
-          {showFilter ? <X className="close-filter" size={18} color="green" /> : <Filter size={18} color="green" hover="white" />}
+        <button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>
+          {showFilter ? (
+            <X className="close-filter" size={18} color="green" />
+          ) : (
+            <Filter size={18} color="green" />
+          )}
           {showFilter ? "Chiudi Filtri" : "Filtra"}
         </button>
       </div>
@@ -117,7 +151,7 @@ export default function Rents() {
             <label>Prezzo</label>
             <input
               type="text"
-              placeholder="es. $100"
+              placeholder="es. 100"
               value={filters.price}
               onChange={(e) => setFilters({ ...filters, price: e.target.value })}
             />
@@ -153,32 +187,45 @@ export default function Rents() {
 
       {/* Lista Auto */}
       <div className="cars-grid">
-        {filteredCars.map((car, i) => (
-          <AnimatedCard key={i} index={i} from={i % 2 === 0 ? "left" : "right"}>
-            <div className="car-card" onClick={() => navigate("/rents/teslamodel3")}
->
-              <img className="car-image" src={car.img} alt={car.name} />
-              <div className="car-info">
-                <h3>{car.name}</h3>
-                <p className="price">{car.price}</p>
-                <p
-                  className="availability"
-                  style={{
-                    color: car.available ? "#00b894" : "#d63031",
-                    fontWeight: 600,
-                    marginTop: "6px",
-                  }}
-                >
-                  {car.available ? "Disponibile" : "Non disponibile"}
+        {loading && <p>Loading...</p>}
 
-
-                </p>
+        {!loading &&
+          filteredCars.map((car, i) => (
+            <AnimatedCard
+              key={car.id}
+              index={i}
+              from={i % 2 === 0 ? "left" : "right"}
+            >
+              <div
+                className="car-card"
+                onClick={() => navigate(`/rents/${car.id}`)}
+              >
+                <img
+                  className="car-image"
+                  src={car.immaggineauto || "/placeholder-car.webp"}
+                  alt={`${car.marca} ${car.modello}`}
+                />
+                <div className="car-info">
+                  <h3>
+                    {car.marca} {car.modello}
+                  </h3>
+                  <p className="price">€ {car.prezzogiornaliero} / giorno</p>
+                  <p
+                    className="availability"
+                    style={{
+                      color: car.disponibile ? "#00b894" : "#d63031",
+                      fontWeight: 600,
+                      marginTop: "6px",
+                    }}
+                  >
+                    {car.disponibile ? "Disponibile" : "Non disponibile"}
+                  </p>
+                </div>
               </div>
-            </div>
-          </AnimatedCard>
-        ))}
+            </AnimatedCard>
+          ))}
 
-        {filteredCars.length === 0 && (
+        {!loading && filteredCars.length === 0 && (
           <p className="no-results">Nessuna auto trovata 😔</p>
         )}
       </div>

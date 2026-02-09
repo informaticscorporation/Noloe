@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "../../supabaseClient";
-import "../../UIX/ClientiSection.css"; // puoi riutilizzare lo stesso CSS
-import { FiFilter } from "react-icons/fi";
+import { useUsers } from "../../hooks/useSupabase";
+import "../../UIX/ClientiSection.css";
+import { Filter } from "lucide-react";
 
 export default function ClientiSection() {
   const [popupOpen, setPopupOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [filters, setFilters] = useState({ nome: "", cognome: "", email: "" });
-  const [users, setUsers] = useState([]);
+  const { data: users, refetch: fetchUsers } = useUsers();
   const [showFilters, setShowFilters] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -27,16 +28,7 @@ export default function ClientiSection() {
 
   const [newUser, setNewUser] = useState(initialUserState);
 
-  // --- Fetch dati utenti
-  const fetchUsers = async () => {
-    const { data, error } = await supabase.from("Users").select("*").order("created_at", { ascending: false });
-    if (error) console.log(error);
-    else setUsers(data || []);
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  // fetchUsers provided by useUsers hook
 
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -96,7 +88,7 @@ export default function ClientiSection() {
         <h1>Clienti</h1>
         <div style={{ display: "flex", gap: "10px" }}>
           <button className="btn-add" onClick={() => setShowFilters(!showFilters)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <FiFilter size={20} /> Filtri
+            <Filter size={20} /> Filtri
           </button>
           <button className="btn-add" onClick={() => { setPopupOpen(true); setSelectedUser(null); setNewUser(initialUserState); }}>
             Aggiungi Cliente

@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Car, MapPin, CalendarDays, Heart, Smartphone, ShieldCheck, DollarSign, CreditCard } from "lucide-react";
+import { supabase } from "../supabaseClient";
 
 import "../UIX/Hero.css";
 import logo from "../assets/logo.webp";
 
 export default function Hero({ menuOpen, setMenuOpen }) {
+  const [carCollection, setCarCollection] = useState([]);
   const [loading, setLoading] = useState(true);
   const closeMenu = () => setMenuOpen(false);
   const navigate = useNavigate();
@@ -31,46 +33,60 @@ export default function Hero({ menuOpen, setMenuOpen }) {
     { name: "Hybrid", icon: <Car size={35} /> },
   ];
 
-  const carCollection = [
-    { id: "bmw-x5", name: "BMW X5", img: "https://pngimg.com/d/bmw_PNG99543.png", price: "$120/day" },
-    { id: "audi-a6", name: "Audi A6", img: "https://www.pngarts.com/files/11/Audi-A6-PNG-High-Quality-Image.png", price: "$100/day" },
-    { id: "teslamodel3", name: "Tesla Model 3", img: "https://www.pngarts.com/files/11/Tesla-Model-S-PNG-Image-Background.png", price: "$150/day" },
-    { id: "ford-mustang", name: "Ford Mustang", img: "https://www.pngarts.com/files/3/Ford-Mustang-PNG-High-Quality-Image.png", price: "$140/day" },
-    {id: "bmw-x5", name: "BMW X5", img: "https://pngimg.com/d/bmw_PNG99543.png", price: "$120/day" },
-    { id: "audi-a6", name: "Audi A6", img: "https://www.pngarts.com/files/11/Audi-A6-PNG-High-Quality-Image.png", price: "$100/day" },
-  ];
+  // Fetch car collection from Supabase
+   useEffect(() => {
+    const fetchCars = async () => {
+      const { data, error } = await supabase
+        .from("Vehicles")
+        .select(`
+          id,
+          marca,
+          modello,
+          categoria,
+          immaggineauto,
+          prezzogiornaliero,
+          alimentazione,
+          cambio,
+          porte,
+          datacreazione
+        `)
+        .order("datacreazione", { ascending: false });
 
+      if (error) console.error(error);
+      else setCarCollection(data || []);
+    };
+    fetchCars();
+  }, []);
   // --- Preloader globale ---
  useEffect(() => {
-  // Controlla se il loading è già stato fatto
-  const hasLoaded = sessionStorage.getItem("Loading") === "true";
+    const hasLoaded = sessionStorage.getItem("Loading") === "true";
 
-  if (!hasLoaded) {
-    const images = [
-      "https://pngimg.com/d/bmw_PNG99543.png",
-      ...brands.map(b => b.src),
-      ...carCollection.map(c => c.img),
-    ];
+    if (!hasLoaded) {
+      const images = [
+        "https://pngimg.com/d/bmw_PNG99543.png",
+        ...brands.map(b => b.src),
+        ...carCollection.map(c => c.immaggineauto).filter(Boolean),
+      ];
 
-    let loaded = 0;
-    const total = images.length;
+      if (!images.length) {
+        setLoading(false);
+        return;
+      }
 
-    images.forEach(src => {
-      const img = new Image();
-      img.src = src;
-      img.onload = img.onerror = () => {
-        loaded++;
-        if (loaded === total) {
-          setLoading(false);
-          sessionStorage.setItem("Loading", "true"); // Salva che è già stato caricato
-        }
-      };
-    });
-  } else {
-    // Se già caricato, salta il preloader
-    setLoading(false);
-  }
-}, []);
+      let loaded = 0;
+      images.forEach(src => {
+        const img = new Image();
+        img.src = src;
+        img.onload = img.onerror = () => {
+          if (++loaded === images.length) {
+            setLoading(false);
+            sessionStorage.setItem("Loading", "true");
+          }
+        };
+      });
+    } else setLoading(false);
+  }, [carCollection]);
+
 
   // --- COMPONENTE ANIMAZIONE ---
   function AnimatedCard({ children, index = 0, from = "bottom", delay = 0.2 }) {
@@ -228,15 +244,15 @@ export default function Hero({ menuOpen, setMenuOpen }) {
 
         <div className="car-grid">
           {carCollection.map((car, idx) => (
-            <AnimatedCard key={idx+1} index={idx + 1} from="bottom">
+            <AnimatedCard key={car.id} index={idx + 1}>
               <div className="car-card">
-                <img className="car-img" src={car.img} alt={car.name} />
-                <h3>{car.name}</h3>
-                <p className="price">{car.price}</p>
+                <img className="car-img" src={car.immaggineauto || "/placeholder-car.webp"} alt={`${car.marca} ${car.modello}`} />
+                <h3>{car.marca} {car.modello}</h3>
+                <p className="price">€ {car.prezzogiornaliero?.toFixed(2)} / day</p>
                 <div className="specs">
-                  <span>🚗 Auto</span>
-                  <span>👨‍👩‍👦 4 Person</span>
-                  <span>⚡ Electric</span>
+                  <span>🚗 {car.categoria || "Auto"}</span>
+                  <span>👨‍👩‍👦 {car.porte || 4}</span>
+                  <span>⚡ {car.alimentazione || "N/A"}</span>
                 </div>
                 <button className="rent-btn" onClick={() => navigate(`/rents/${car.id}`)}>Rent Now</button>
               </div>

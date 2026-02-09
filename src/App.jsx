@@ -15,6 +15,7 @@ import Pagamento from "./Page/Pagamento";
 import UserArea from "./Page/UserArea";
 import Dashboard from "./Page/Dashboard";
 import Pronotation from "./Page/Prenotation";
+import Checkout from "./Page/Checkout";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
             <Route path="/pagamento" element={<Pagamento/>} />
             <Route path="/pagamento/successo" element={<Pagamento />} />
             <Route path="/userarea" element={<UserArea />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>
 

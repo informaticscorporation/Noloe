@@ -5,6 +5,14 @@
   position: relative;
   font-family: "Poppins", sans-serif;
 }
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
 
 .login-left {
   flex: 1;

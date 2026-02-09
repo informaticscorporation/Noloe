@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import "../UIX/Login.css";
 
@@ -76,7 +77,11 @@ export default function Login() {
 
   return (
     <div className="login-container">
+       <button className="back-btn" onClick={() => navigate(-1)}>
+          <ArrowLeft size={18} color="white" />
+        </button>
       <div className="login-left">
+
         <Animation>
           <h1 className="logo">Create Your Account</h1>
           <p className="subtitle">Register now and manage your car rentals with ease.</p>

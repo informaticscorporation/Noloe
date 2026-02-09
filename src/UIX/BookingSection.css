@@ -1,13 +1,11 @@
 /* ===================== CONTAINER PRINCIPALE ===================== */
 .booking-section-container {
-  background-color: #f5f6fa;
-  padding: 20px;
+  background: transparent;
+  padding: 24px;
   color: #1f2937;
   font-family: 'Inter', sans-serif;
   max-width: 1400px;
   margin: 0 auto;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
 }
 
 /* ===================== HEADER ===================== */
@@ -15,42 +13,56 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .booking-header h1 {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #111827;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  position: relative;
+}
+
+.booking-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 48px;
+  height: 4px;
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+  border-radius: 2px;
 }
 
 /* ===================== BUTTONS ===================== */
 .btn-add,
 .popup-btn {
-  background-color: #16a34a;
+  background: #16a34a;
   color: #ffffff;
   border: none;
-  padding: 10px 18px;
+  padding: 12px 24px;
   cursor: pointer;
   border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s ease;
 }
 
 .btn-add:hover,
 .popup-btn:hover {
-  background-color: #12883c;
-  transform: translateY(-2px);
+  background: #15803d;
 }
 
 /* Pulsante elimina rosso */
 .popup-btn.delete {
-  background-color: #dc2626;
+  background: #dc2626;
 }
 
 .popup-btn.delete:hover {
-  background-color: #b91c1c;
-  transform: translateY(-2px);
+  background: #b91c1c;
 }
 
 /* ===================== FILTRI ===================== */
@@ -58,67 +70,75 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  align-items: center;
 }
 
 .booking-filters input,
 .booking-filters select {
   padding: 10px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   min-width: 160px;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  background: #ffffff;
+  font-size: 14px;
+  color: #374151;
 }
 
 .booking-filters input:focus,
 .booking-filters select:focus {
   outline: none;
   border-color: #16a34a;
-  box-shadow: 0 0 0 3px rgba(22,163,74,0.2);
+}
+
+.booking-filters input::placeholder {
+  color: #94a3b8;
 }
 
 /* ===================== TABELLA ===================== */
 .booking-table-container {
   overflow-x: auto;
   width: 100%;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 .booking-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
   min-width: 900px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  background: #ffffff;
 }
 
 .booking-table th,
 .booking-table td {
-  padding: 12px 15px;
+  padding: 12px 16px;
   text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .booking-table th {
-  background-color: #16a34a;
+  background: #16a34a;
   color: #ffffff;
   font-weight: 600;
-  position: sticky;
-  top: 0;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
 }
 
-.booking-table tr:nth-child(even) {
-  background-color: #f9fafb;
+.booking-table tbody tr {
+  transition: background 0.15s ease;
 }
 
 .booking-table tr:hover {
-  background-color: #e6f4ea;
+  background: #f8fafc;
   cursor: pointer;
 }
 
 /* Riga selezionata */
 .booking-table tr.selected {
-  background-color: #a7f3d0 !important;
+  background: #dcfce7 !important;
 }
 
 /* ===================== POPUP ===================== */
@@ -128,48 +148,58 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.6);
+  background: rgba(15, 23, 42, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 15px;
+  padding: 20px;
   z-index: 1000;
-  animation: fadeIn 0.25s ease-in-out;
+  animation: fadeIn 0.2s ease;
 }
 
 .popup-content {
-  background-color: #ffffff;
-  padding: 30px 35px;
+  background: #ffffff;
+  padding: 32px;
   width: 100%;
   max-width: 700px;
-  border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+  max-height: 85vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
   position: relative;
-  transform: translateY(-20px);
-  opacity: 0;
   overflow-y: auto;
-  animation: popupIn 0.35s forwards;
+  animation: popupIn 0.3s ease;
+}
+
+.popup-content h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 20px;
 }
 
 .popup-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: transparent;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: #f1f5f9;
   border: none;
-  font-size: 1.5rem;
-  font-weight: bold;
+  border-radius: 8px;
+  font-size: 1.2rem;
   cursor: pointer;
-  color: #6b7280;
-  transition: color 0.2s ease-in-out;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .popup-close:hover {
-  color: #111827;
+  color: #0f172a;
+  background: #e2e8f0;
 }
 
 /* ===================== FORM ===================== */
@@ -189,37 +219,47 @@
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
 }
 
 .form-field label {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
 }
 
 .form-field input,
-.form-field select {
-  padding: 12px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  font-size: 1rem;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+.form-field select,
+.form-field textarea {
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #ffffff;
+  color: #1e293b;
 }
 
 .form-field input:focus,
-.form-field select:focus {
+.form-field select:focus,
+.form-field textarea:focus {
   outline: none;
   border-color: #16a34a;
-  box-shadow: 0 0 0 3px rgba(22,163,74,0.2);
+}
+
+.form-field input::placeholder {
+  color: #94a3b8;
 }
 
 /* ===================== STEP NAVIGATION ===================== */
 .step-navigation {
   display: flex;
-  justify-content: space-between;
-  margin-top: 25px;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
 }
 
 /* ===================== ANIMAZIONI ===================== */
@@ -229,26 +269,41 @@
 }
 
 @keyframes popupIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(-20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
 /* ===================== RESPONSIVO ===================== */
 @media (max-width: 768px) {
-  .form-step {
+  .booking-section-container {
+    padding: 16px;
+  }
+
+  .booking-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-step.active {
     flex-direction: column;
   }
 
   .popup-content {
-    padding: 20px;
+    padding: 24px 20px;
+  }
+
+  .booking-filters {
+    flex-direction: column;
   }
 
   .booking-filters input,
   .booking-filters select {
-    min-width: 100%;
-  }
-
-  .booking-table {
     min-width: 100%;
   }
 }

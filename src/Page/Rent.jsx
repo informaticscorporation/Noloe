@@ -2,8 +2,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { ArrowLeft, CarFront, Gauge, Users, Fuel, Settings } from "lucide-react";
 import "../UIX/Rent.css";
+import { supabase } from "../supabaseClient";
 
-// --- COMPONENTE ANIMAZIONE ---
+// --- ANIMAZIONE ---
 function AnimatedSection({ children, from = "bottom", delay = 0.2 }) {
   const ref = useRef();
   const [visible, setVisible] = useState(false);
@@ -48,106 +49,25 @@ export default function Rent() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const cars = [
-    {
-      id: "bmw-x5",
-      name: "BMW X5",
-      img: "https://pngimg.com/d/bmw_PNG99543.png",
-      price: "€120/giorno",
-      category: "SUV",
-      available: true,
-      description:
-        "Potente SUV con comfort di lusso e prestazioni elevate, perfetto per lunghi viaggi o noleggi premium.",
-      details: {
-        motore: "3.0L Turbo",
-        posti: 5,
-        porte: 5,
-        carburante: "Diesel",
-        cambio: "Automatico",
-        anno: 2023,
-        km: "15.000 km",
-        colore: "Nero metallizzato",
-      },
-      optional: ["Navigatore GPS", "Bluetooth", "Sensori di parcheggio", "Telecamera posteriore"],
-      sicurezza: ["Airbag frontali e laterali", "ABS", "Controllo stabilità"],
-      tecnologia: ["Display touch 12\"", "Apple CarPlay", "Android Auto"],
-      comfort: ["Climatizzatore automatico", "Sedili riscaldati", "Interni in pelle"],
-    },
-    {
-      id: "audi-a6",
-      name: "Audi A6",
-      img: "https://www.pngarts.com/files/11/Audi-A6-PNG-High-Quality-Image.png",
-      price: "€100/giorno",
-      category: "Berlina",
-      available: false,
-      description:
-        "Elegante berlina tedesca, ideale per viaggi d'affari e spostamenti confortevoli.",
-      details: {
-        motore: "2.0L TFSI",
-        posti: 5,
-        porte: 4,
-        carburante: "Benzina",
-        cambio: "Automatico",
-        anno: 2022,
-        km: "22.000 km",
-        colore: "Grigio chiaro",
-      },
-      optional: ["Navigatore GPS", "Bluetooth", "Sensori di parcheggio"],
-      sicurezza: ["Airbag frontali e laterali", "ABS"],
-      tecnologia: ["Display touch 10\"", "Apple CarPlay"],
-      comfort: ["Climatizzatore automatico", "Sedili riscaldati"],
-    },
-    {
-      id: "teslamodel3",
-      name: "Tesla Model 3",
-      img: "https://www.pngarts.com/files/11/Tesla-Model-S-PNG-Image-Background.png",
-      price: "€150/giorno",
-      category: "Elettrica",
-      available: true,
-      description:
-        "Auto elettrica con autonomia estesa, tecnologia avanzata e prestazioni eccezionali.",
-      details: {
-        motore: "Dual Motor",
-        posti: 5,
-        porte: 4,
-        carburante: "Elettrico",
-        cambio: "Automatico",
-        anno: 2023,
-        km: "5.000 km",
-        colore: "Bianco perla",
-      },
-      optional: ["Autopilot", "Bluetooth", "Telecamera posteriore"],
-      sicurezza: ["Airbag frontali e laterali", "ABS", "Controllo stabilità"],
-      tecnologia: ["Display touch 15\"", "Apple CarPlay", "Android Auto"],
-      comfort: ["Climatizzatore automatico", "Sedili riscaldati"],
-    },
-    {
-      id: "ford-mustang",
-      name: "Ford Mustang",
-      img: "https://www.pngarts.com/files/3/Ford-Mustang-PNG-High-Quality-Image.png",
-      price: "€140/giorno",
-      category: "Sportiva",
-      available: true,
-      description:
-        "La leggendaria muscle car americana, potenza pura e design inconfondibile.",
-      details: {
-        motore: "5.0L V8",
-        posti: 4,
-        porte: 2,
-        carburante: "Benzina",
-        cambio: "Manuale",
-        anno: 2021,
-        km: "12.000 km",
-        colore: "Rosso metallizzato",
-      },
-      optional: ["Bluetooth", "Sensori di parcheggio"],
-      sicurezza: ["Airbag frontali e laterali", "ABS"],
-      tecnologia: ["Display touch 8\"", "Apple CarPlay"],
-      comfort: ["Climatizzatore manuale", "Sedili sportivi"],
-    },
-  ];
+  const [car, setCar] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const car = cars.find((c) => c.id === id);
+  useEffect(() => {
+    const fetchCar = async () => {
+      const { data, error } = await supabase
+        .from("Vehicles")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (!error) setCar(data);
+      setLoading(false);
+    };
+
+    fetchCar();
+  }, [id]);
+
+  if (loading) return <p className="rent-container">Caricamento...</p>;
 
   if (!car) {
     return (
@@ -155,10 +75,12 @@ export default function Rent() {
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={20} />
         </button>
-        <h2>Auto non trovata 😔</h2>
+        <h2>Veicolo non trovato 😔</h2>
       </div>
     );
   }
+
+  const disponibile = !car.fuori_servizio && !car.inmanutenzione;
 
   return (
     <div className="rent-container">
@@ -167,77 +89,51 @@ export default function Rent() {
           <ArrowLeft size={20} />
         </button>
         <h1>
-          <CarFront size={26} /> {car.name}
+          <CarFront size={26} /> {car.marca} {car.modello}
         </h1>
       </div>
 
       <AnimatedSection>
         <div className="rent-card">
-          <img src={car.img} alt={car.name} className="rent-img" />
+          <img
+            src={car.immaggineauto}
+            alt={`${car.marca} ${car.modello}`}
+            className="rent-img"
+          />
 
           <div className="rent-info">
-            <h2>{car.name}</h2>
-            <p className="rent-category">{car.category}</p>
-            <p className="rent-desc">{car.description}</p>
+            <h2>{car.marca} {car.modello}</h2>
+            <p className="rent-category">{car.categoria}</p>
 
             <div className="rent-section">
               <h3>Dettagli tecnici</h3>
               <div className="rent-details">
-                <p><Gauge size={16} /> Motore: {car.details.motore}</p>
-                <p><Users size={16} /> Posti: {car.details.posti}</p>
-                <p><Users size={16} /> Porte: {car.details.porte}</p>
-                <p><Fuel size={16} /> Carburante: {car.details.carburante}</p>
-                <p><Settings size={16} /> Cambio: {car.details.cambio}</p>
-                <p>Anno: {car.details.anno}</p>
-                <p>Chilometri: {car.details.km}</p>
-                <p>Colore: {car.details.colore}</p>
+                <p><Gauge size={16} /> Cilindrata: {car.cilindrata} cc</p>
+                <p><Users size={16} /> Porte: {car.porte}</p>
+                <p><Fuel size={16} /> Alimentazione: {car.alimentazione}</p>
+                <p><Settings size={16} /> Cambio: {car.cambio}</p>
+                <p>Chilometri: {car.kmattuali} km</p>
+                <p>Colore: {car.colore}</p>
               </div>
             </div>
 
-            {car.optional?.length > 0 && (
-              <div className="rent-section">
-                <h3>Optional & Comfort</h3>
-                <ul>
-                  {car.optional.map((opt, i) => <li key={i}>{opt}</li>)}
-                </ul>
-              </div>
-            )}
-
-           
-
-            {car.sicurezza?.length > 0 && (
-              <div className="rent-section">
-                <h3>Sicurezza</h3>
-                <ul>
-                  {car.sicurezza.map((item, i) => <li key={i}>{item}</li>)}
-                </ul>
-              </div>
-            )}
-
-            {car.tecnologia?.length > 0 && (
-              <div className="rent-section">
-                <h3>Tecnologia</h3>
-                <ul>
-                  {car.tecnologia.map((item, i) => <li key={i}>{item}</li>)}
-                </ul>
-              </div>
-            )}
-
-            <p className="rent-price">{car.price}</p>
+            <p className="rent-price">
+              €{car.prezzogiornaliero} / giorno
+            </p>
 
             <p
               className="rent-availability"
-              style={{ color: car.available ? "#00b894" : "#d63031" }}
+              style={{ color: disponibile ? "#00b894" : "#d63031" }}
             >
-              {car.available ? "Disponibile" : "Non disponibile"}
+              {disponibile ? "Disponibile" : "Non disponibile"}
             </p>
 
             <button
-              className={`rent-btn ${!car.available ? "disabled" : ""}`}
-              disabled={!car.available}
-              onClick={() => car.available && navigate(`/prenotation/${id}`)}
+              className={`rent-btn ${!disponibile ? "disabled" : ""}`}
+              disabled={!disponibile}
+              onClick={() => disponibile && navigate(`/prenotation/${id}`)}
             >
-              {car.available ? "Prenota ora" : "Non disponibile"}
+              {disponibile ? "Prenota ora" : "Non disponibile"}
             </button>
           </div>
         </div>
